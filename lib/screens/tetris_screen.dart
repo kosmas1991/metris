@@ -43,8 +43,8 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
   void initGame() {
     // Initialize empty game board
-    gameBoard = List.generate(
-        boardHeight, (_) => List.generate(boardWidth, (_) => 0));
+    gameBoard =
+        List.generate(boardHeight, (_) => List.generate(boardWidth, (_) => 0));
 
     // Create initial pieces
     currentPiece = Tetromino.getRandom();
@@ -230,21 +230,25 @@ class _TetrisScreenState extends State<TetrisScreen> {
     final highScore = scoreState.highScore;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Flutter Tetris'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: resetGame,
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Flutter Tetris'),
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.refresh),
+      //       onPressed: resetGame,
+      //     ),
+      //   ],
+      // ),
       body: Column(
         children: [
+          const SizedBox(
+            height: 20,
+          ),
           ScoreBoard(score: score, highScore: highScore),
           Expanded(
             child: Row(
               children: [
+                const SizedBox(width: 10),
                 Expanded(
                   flex: 3,
                   child: GameBoard(
@@ -252,6 +256,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
                     currentPiece: currentPiece,
                   ),
                 ),
+                const SizedBox(width: 10),
                 Expanded(
                   flex: 1,
                   child: Column(
@@ -259,14 +264,27 @@ class _TetrisScreenState extends State<TetrisScreen> {
                     children: [
                       NextPiece(piece: nextPiece),
                       const SizedBox(height: 20),
-                      if (isGameOver)
-                        ElevatedButton(
-                          onPressed: resetGame,
-                          child: const Text('Play Again'),
+                      // if (isGameOver)
+                      ElevatedButton(
+                        onPressed: resetGame,
+                        style: ButtonStyle(
+                            backgroundColor:
+                                const WidgetStatePropertyAll(Colors.cyan),
+                            shape: WidgetStateProperty.all<LinearBorder>(
+                              const LinearBorder(),
+                            )),
+                        child: const Text(
+                          'New Game',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
+                      ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 10),
               ],
             ),
           ),
@@ -343,7 +361,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
                   onLongPressUp: cancelFastDrop,
                   child: IconButton(
                     icon: const Icon(
-                      Icons.arrow_drop_down,
+                      Icons.keyboard_double_arrow_down,
                       color: Colors.white,
                     ),
                     onPressed: moveDown,
@@ -353,6 +371,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
               ),
             ],
           ),
+          const SizedBox(
+            height: 10,
+          )
         ],
       ),
     );

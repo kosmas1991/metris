@@ -14,7 +14,7 @@ class NextPiece extends StatelessWidget {
     return Column(
       children: [
         const Text(
-          'Next Piece',
+          'Next',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),
