@@ -2,154 +2,234 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class Tetromino {
-  int type;
-  int rotation = 0;
-  int x;
-  int y;
-  List<Offset> positions = [];
+  String type;
+  int rotationState = 0;
+  int x = 0;
+  int y = 0;
+  late List<Offset> positions;
 
-  static const List<Color> colors = [
-    Colors.transparent,
-    Colors.cyan,
-    Colors.blue,
-    Colors.orange,
-    Colors.yellow,
-    Colors.green,
-    Colors.purple,
-    Colors.red,
+  static final Map<String, List<List<List<int>>>> shapes = {
+    'I': [
+      [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ],
+      [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+      ],
+      [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+      ],
+      [
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+      ],
+    ],
+    'J': [
+      [
+        [1, 0, 0],
+        [1, 1, 1],
+        [0, 0, 0],
+      ],
+      [
+        [0, 1, 1],
+        [0, 1, 0],
+        [0, 1, 0],
+      ],
+      [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 0, 1],
+      ],
+      [
+        [0, 1, 0],
+        [0, 1, 0],
+        [1, 1, 0],
+      ],
+    ],
+    'L': [
+      [
+        [0, 0, 1],
+        [1, 1, 1],
+        [0, 0, 0],
+      ],
+      [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 1],
+      ],
+      [
+        [0, 0, 0],
+        [1, 1, 1],
+        [1, 0, 0],
+      ],
+      [
+        [1, 1, 0],
+        [0, 1, 0],
+        [0, 1, 0],
+      ],
+    ],
+    'O': [
+      [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0],
+      ],
+      [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0],
+      ],
+      [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0],
+      ],
+      [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 1, 0],
+        [0, 0, 0, 0],
+      ],
+    ],
+    'S': [
+      [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0],
+      ],
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 0, 1],
+      ],
+      [
+        [0, 0, 0],
+        [0, 1, 1],
+        [1, 1, 0],
+      ],
+      [
+        [1, 0, 0],
+        [1, 1, 0],
+        [0, 1, 0],
+      ],
+    ],
+    'T': [
+      [
+        [0, 1, 0],
+        [1, 1, 1],
+        [0, 0, 0],
+      ],
+      [
+        [0, 1, 0],
+        [0, 1, 1],
+        [0, 1, 0],
+      ],
+      [
+        [0, 0, 0],
+        [1, 1, 1],
+        [0, 1, 0],
+      ],
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [0, 1, 0],
+      ],
+    ],
+    'Z': [
+      [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0],
+      ],
+      [
+        [0, 0, 1],
+        [0, 1, 1],
+        [0, 1, 0],
+      ],
+      [
+        [0, 0, 0],
+        [1, 1, 0],
+        [0, 1, 1],
+      ],
+      [
+        [0, 1, 0],
+        [1, 1, 0],
+        [1, 0, 0],
+      ],
+    ],
+  };
+
+  static final List<Color> colors = [
+    Colors.cyan, // I
+    Colors.blue, // J
+    Colors.orange, // L
+    Colors.yellow, // O
+    Colors.green, // S
+    Colors.purple, // T
+    Colors.red, // Z
   ];
 
-  static const List<List<List<int>>> shapes = [
-    [],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ],
-    [
-      [2, 0, 0],
-      [2, 2, 2],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 3],
-      [3, 3, 3],
-      [0, 0, 0],
-    ],
-    [
-      [4, 4],
-      [4, 4],
-    ],
-    [
-      [0, 5, 5],
-      [5, 5, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 6, 0],
-      [6, 6, 6],
-      [0, 0, 0],
-    ],
-    [
-      [7, 7, 0],
-      [0, 7, 7],
-      [0, 0, 0],
-    ],
-  ];
+  static final List<String> types = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
 
-  Tetromino({required this.type, this.rotation = 0})
-      : x = 3,
-        y = _calculateInitialY(type) {
-    _updatePositions();
-  }
+  Tetromino({required this.type}) {
+    positions = _calculatePositions();
 
-  // Calculate the initial y position based on the piece type
-  static int _calculateInitialY(int type) {
-    // Get the shape height based on the type
-    final shape = shapes[type];
-    // Start with the piece just above the visible board
-    // This negative position will make the piece gradually appear from the top
-    return -shape.length + 1;
+    // Center the piece horizontally
+    x = 3;
+
+    // Start higher for I piece to avoid immediate collision
+    y = type == 'I' ? -2 : -1;
   }
 
   static Tetromino getRandom() {
     final random = Random();
-    final type = random.nextInt(7) + 1;
-    return Tetromino(type: type);
+    final randomType = types[random.nextInt(types.length)];
+    return Tetromino(type: randomType);
   }
 
-  Color get color => colors[type];
+  static String getRandomType() {
+    final random = Random();
+    return types[random.nextInt(types.length)];
+  }
 
-  void _updatePositions() {
-    positions = [];
-    final shape = _rotateMatrix(shapes[type], rotation);
+  List<Offset> _calculatePositions() {
+    final positions = <Offset>[];
+    final shape = shapes[type]![rotationState];
 
-    for (int y = 0; y < shape.length; y++) {
-      for (int x = 0; x < shape[y].length; x++) {
-        if (shape[y][x] == type) {
-          positions.add(Offset(x.toDouble(), y.toDouble()));
+    for (var row = 0; row < shape.length; row++) {
+      for (var col = 0; col < shape[row].length; col++) {
+        if (shape[row][col] == 1) {
+          positions.add(Offset(col.toDouble(), row.toDouble()));
         }
       }
     }
-  }
 
-  List<List<int>> _rotateMatrix(List<List<int>> matrix, int rotation) {
-    // Deep copy the matrix to avoid modifying the original
-    List<List<int>> rotated = matrix.map((row) => row.toList()).toList();
-
-    // Special case for "I", "Z", and reverse "Z" shapes
-    bool isSpecialShape =
-        (matrix == shapes[1] || matrix == shapes[5] || matrix == shapes[7]);
-    if (isSpecialShape) {
-      rotation %= 2; // Only allow two unique rotations (0 and 1)
-    }
-
-    for (int i = 0; i < rotation; i++) {
-      rotated = List.generate(
-          rotated[0].length,
-          (x) => List.generate(
-              rotated.length, (y) => rotated[rotated.length - y - 1][x]));
-    }
-
-    return rotated;
+    return positions;
   }
 
   void rotate() {
-    int prevRotation = rotation;
-    rotation = (rotation + 1) % 4;
-    _updatePositions();
-
-    if (!isValidPosition()) {
-      rotation = prevRotation;
-      _updatePositions();
-    }
+    rotationState = (rotationState + 1) % 4;
+    positions = _calculatePositions();
   }
 
-  bool canRotate(List<List<int>> board) {
-    int nextRotation = (rotation + 1) % 4;
-    List<Offset> newPositions = [];
-    final shape = _rotateMatrix(shapes[type], nextRotation);
-
-    for (int y = 0; y < shape.length; y++) {
-      for (int x = 0; x < shape[y].length; x++) {
-        if (shape[y][x] == type) {
-          newPositions.add(Offset(x.toDouble(), y.toDouble()));
-        }
-      }
-    }
-
-    for (final point in newPositions) {
-      final newX = point.dx.toInt() + x;
-      final newY = point.dy.toInt() + y;
-      if (newX < 0 ||
-          newX >= board[0].length ||
-          newY >= board.length ||
-          (newY >= 0 && board[newY][newX] != 0)) {
-        return false;
-      }
-    }
-    return true;
+  void rotateBack() {
+    rotationState = (rotationState - 1) % 4;
+    if (rotationState < 0) rotationState += 4;
+    positions = _calculatePositions();
   }
 
   void moveLeft() {
@@ -164,47 +244,100 @@ class Tetromino {
     y++;
   }
 
+  void moveUp([int steps = 1]) {
+    y -= steps;
+  }
+
   bool canMoveLeft(List<List<int>> board) {
-    for (final point in positions) {
-      final newX = point.dx.toInt() + x - 1;
-      final newY = point.dy.toInt() + y;
-      if (newX < 0 || (newY >= 0 && board[newY][newX] != 0)) {
-        return false;
+    for (final position in positions) {
+      final newX = (position.dx + x - 1).toInt();
+      final newY = (position.dy + y).toInt();
+
+      // Check boundary
+      if (newX < 0) return false;
+
+      // Check collision with placed pieces
+      if (newY >= 0 && newY < board.length && newX < board[newY].length) {
+        if (board[newY][newX] != 0) return false;
       }
     }
+
     return true;
   }
 
   bool canMoveRight(List<List<int>> board) {
-    for (final point in positions) {
-      final newX = point.dx.toInt() + x + 1;
-      final newY = point.dy.toInt() + y;
-      if (newX >= board[0].length || (newY >= 0 && board[newY][newX] != 0)) {
-        return false;
+    for (final position in positions) {
+      final newX = (position.dx + x + 1).toInt();
+      final newY = (position.dy + y).toInt();
+
+      // Check boundary
+      if (newX >= board[0].length) return false;
+
+      // Check collision with placed pieces
+      if (newY >= 0 && newY < board.length) {
+        if (board[newY][newX] != 0) return false;
       }
     }
+
     return true;
   }
 
   bool canMoveDown(List<List<int>> board) {
-    for (final point in positions) {
-      final newX = point.dx.toInt() + x;
-      final newY = point.dy.toInt() + y + 1;
-      if (newY >= board.length || (newY >= 0 && board[newY][newX] != 0)) {
-        return false;
+    for (final position in positions) {
+      final newX = (position.dx + x).toInt();
+      final newY = (position.dy + y + 1).toInt();
+
+      // Check boundary
+      if (newY >= board.length) return false;
+
+      // Check collision with placed pieces
+      if (newY >= 0 && newX >= 0 && newX < board[0].length) {
+        if (board[newY][newX] != 0) return false;
       }
     }
+
     return true;
   }
 
-  bool isValidPosition() {
-    for (final point in positions) {
-      final newX = point.dx.toInt() + x;
-      final newY = point.dy.toInt() + y;
-      if (newX < 0 || newX >= 10 || newY >= 20) {
-        return false;
-      }
+  Color get color {
+    switch (type) {
+      case 'I':
+        return colors[0];
+      case 'J':
+        return colors[1];
+      case 'L':
+        return colors[2];
+      case 'O':
+        return colors[3];
+      case 'S':
+        return colors[4];
+      case 'T':
+        return colors[5];
+      case 'Z':
+        return colors[6];
+      default:
+        return Colors.grey;
     }
-    return true;
+  }
+
+  int typeToInt() {
+    switch (type) {
+      case 'I':
+        return 1;
+      case 'J':
+        return 2;
+      case 'L':
+        return 3;
+      case 'O':
+        return 4;
+      case 'S':
+        return 5;
+      case 'T':
+        return 6;
+      case 'Z':
+        return 7;
+      default:
+        return 0;
+    }
   }
 }

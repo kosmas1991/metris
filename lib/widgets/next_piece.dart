@@ -43,6 +43,8 @@ class _NextPiecePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Calculate cell size based on the tetromino shape
     final shape = Tetromino.shapes[piece.type];
+    if (shape == null) return;
+
     final cellSize = size.width / shape[0].length;
 
     // Draw the piece in the center of the container
@@ -68,6 +70,6 @@ class _NextPiecePainter extends CustomPainter {
   @override
   bool shouldRepaint(_NextPiecePainter oldDelegate) {
     return oldDelegate.piece.type != piece.type ||
-        oldDelegate.piece.rotation != piece.rotation;
+        oldDelegate.piece.rotationState != piece.rotationState;
   }
 }

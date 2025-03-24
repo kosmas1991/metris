@@ -1,11 +1,12 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
+import '../blocs/score_bloc.dart';
 import '../models/tetromino.dart';
 import '../widgets/game_board.dart';
 import '../widgets/next_piece.dart';
 import '../widgets/score_board.dart';
-import '../blocs/score_bloc.dart';
 
 class TetrisScreen extends StatefulWidget {
   const TetrisScreen({super.key});
@@ -15,26 +16,45 @@ class TetrisScreen extends StatefulWidget {
 }
 
 class _TetrisScreenState extends State<TetrisScreen> {
-  static const int boardWidth = 10;
-  static const int boardHeight = 20;
-
   late List<List<int>> gameBoard;
   late Tetromino currentPiece;
   late Tetromino nextPiece;
   late Timer gameTimer;
-  int score = 0;
-  int highScore = 0;
-  bool isGameOver = false;
 
-  // New variables for fast drop functionality
+  int score = 0;
+  bool isGameOver = false;
   Timer? fastDropTimer;
-  bool isHoldingDown = false;
+
+  static const int boardWidth = 10;
+  static const int boardHeight = 20;
 
   @override
   void initState() {
     super.initState();
     initGame();
-    context.read<ScoreBloc>().add(UpdateScore(score));
+
+    // Listen for keyboard events
+    RawKeyboard.instance.addListener(_handleKeyEvent);
+  }
+
+  void _handleKeyEvent(RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+        moveLeft();
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        moveRight();
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        rotate();
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        startFastDrop();
+      } else if (event.logicalKey == LogicalKeyboardKey.space) {
+        hardDrop();
+      }
+    } else if (event is RawKeyUpEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        cancelFastDrop();
+      }
+    }
   }
 
   void _saveHighScore() {
@@ -63,6 +83,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
     _saveHighScore();
     gameTimer.cancel();
     cancelFastDrop();
+    RawKeyboard.instance.removeListener(_handleKeyEvent);
     super.dispose();
   }
 
@@ -89,292 +110,327 @@ class _TetrisScreenState extends State<TetrisScreen> {
   void rotate() {
     if (isGameOver) return;
 
-    if (currentPiece.canRotate(gameBoard)) {
-      setState(() {
-        currentPiece.rotate();
-      });
-    }
+    setState(() {
+      currentPiece.rotate();
+      if (_isColliding(currentPiece)) {
+        // Try wall kicks
+        currentPiece.moveLeft();
+        if (_isColliding(currentPiece)) {
+          currentPiece.moveRight();
+          currentPiece.moveRight();
+          if (_isColliding(currentPiece)) {
+            currentPiece.moveLeft();
+            currentPiece.rotateBack();
+          }
+        }
+      }
+    });
   }
 
-  void moveDown() {
+  void startFastDrop() {
     if (isGameOver) return;
 
-    if (currentPiece.canMoveDown(gameBoard)) {
-      setState(() {
-        currentPiece.moveDown();
-      });
-    } else {
-      // Lock the piece in place
-      placePiece();
-
-      // Check for completed lines
-      checkLines();
-
-      // Get next piece
-      currentPiece = nextPiece;
-      nextPiece = Tetromino.getRandom();
-
-      // Check for game over
-      if (!currentPiece.canMoveDown(gameBoard)) {
-        setState(() {
-          isGameOver = true;
-        });
-        gameTimer.cancel();
-        cancelFastDrop();
-      }
-    }
-  }
-
-  // New method to start fast dropping
-  void startFastDrop() {
-    if (isGameOver || isHoldingDown) return;
-
-    setState(() {
-      isHoldingDown = true;
-    });
-
-    // Create a timer that moves the piece down quickly
+    cancelFastDrop();
     fastDropTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       moveDown();
     });
   }
 
-  // New method to cancel fast dropping
   void cancelFastDrop() {
     fastDropTimer?.cancel();
     fastDropTimer = null;
+  }
+
+  void hardDrop() {
+    if (isGameOver) return;
 
     setState(() {
-      isHoldingDown = false;
+      while (true) {
+        currentPiece.moveDown();
+        if (_isColliding(currentPiece)) {
+          currentPiece.moveUp();
+          _placePiece();
+          _checkGameState();
+          break;
+        }
+      }
     });
   }
 
-  void placePiece() {
+  void moveDown() {
+    if (isGameOver) return;
+
+    setState(() {
+      currentPiece.moveDown();
+
+      if (_isColliding(currentPiece)) {
+        // Move piece back up
+        currentPiece.moveUp();
+
+        // Lock piece in place
+        _placePiece();
+
+        // Check for game over or prepare for next piece
+        _checkGameState();
+      }
+    });
+  }
+
+  void _checkGameState() {
+    // Check for completed lines
+    final linesCleared = _clearLines();
+    if (linesCleared > 0) {
+      // Add score based on lines cleared
+      score += linesCleared * 100;
+    }
+
+    // Check for game over
+    if (_isGameOverCondition()) {
+      _gameOver();
+      return;
+    }
+
+    // Create next piece
+    currentPiece = nextPiece;
+    nextPiece = Tetromino.getRandom();
+  }
+
+  void _placePiece() {
     for (final point in currentPiece.positions) {
       final x = point.dx.toInt() + currentPiece.x;
       final y = point.dy.toInt() + currentPiece.y;
 
       if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight) {
-        gameBoard[y][x] = currentPiece.type;
+        gameBoard[y][x] = currentPiece.typeToInt();
       }
     }
   }
 
-  void checkLines() {
-    List<int> linesToRemove = [];
+  int _clearLines() {
+    int linesCleared = 0;
 
-    for (int y = 0; y < boardHeight; y++) {
-      bool isComplete = true;
+    for (int y = boardHeight - 1; y >= 0; y--) {
+      bool isLineComplete = true;
+
       for (int x = 0; x < boardWidth; x++) {
         if (gameBoard[y][x] == 0) {
-          isComplete = false;
+          isLineComplete = false;
           break;
         }
       }
-      if (isComplete) {
-        linesToRemove.add(y);
+
+      if (isLineComplete) {
+        linesCleared++;
+
+        // Shift all lines above down
+        for (int y2 = y; y2 > 0; y2--) {
+          for (int x = 0; x < boardWidth; x++) {
+            gameBoard[y2][x] = gameBoard[y2 - 1][x];
+          }
+        }
+
+        // Create a new empty line at the top
+        for (int x = 0; x < boardWidth; x++) {
+          gameBoard[0][x] = 0;
+        }
+
+        // Since the line is now removed, check the same y index again
+        y++;
       }
     }
 
-    if (linesToRemove.isNotEmpty) {
-      setState(() {
-        // Award points based on number of lines cleared
-        switch (linesToRemove.length) {
-          case 1:
-            score += 100;
-            break;
-          case 2:
-            score += 300;
-            break;
-          case 3:
-            score += 500;
-            break;
-          case 4:
-            score += 800; // Tetris!
-            break;
-        }
-
-        // Remove completed lines
-        for (final line in linesToRemove) {
-          gameBoard.removeAt(line);
-          gameBoard.insert(0, List.generate(boardWidth, (_) => 0));
-        }
-
-        // Update the score in the bloc
-        context.read<ScoreBloc>().add(UpdateScore(score));
-      });
-    }
+    return linesCleared;
   }
 
-  void resetGame() {
-    // Save high score before resetting
-    _saveHighScore();
+  bool _isColliding(Tetromino piece) {
+    for (final point in piece.positions) {
+      final x = point.dx.toInt() + piece.x;
+      final y = point.dy.toInt() + piece.y;
 
-    // Cancel the current timer before initializing a new game
-    gameTimer.cancel();
+      // Check boundaries
+      if (x < 0 || x >= boardWidth || y >= boardHeight) {
+        return true;
+      }
 
+      // Check collision with locked pieces (only if piece is within the board)
+      if (y >= 0 && gameBoard[y][x] != 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool _isGameOverCondition() {
+    // Check if any blocks in the top row are filled
+    for (int x = 0; x < boardWidth; x++) {
+      if (gameBoard[0][x] != 0) {
+        return true;
+      }
+    }
+
+    // Also check if the new piece would collide immediately
+    return _isColliding(nextPiece);
+  }
+
+  void _gameOver() {
     setState(() {
-      initGame();
-      score = 0;
-      isGameOver = false;
+      isGameOver = true;
     });
 
-    // Reset current score in bloc but keep high score
-    context.read<ScoreBloc>().add(ResetScore());
+    gameTimer.cancel();
+    cancelFastDrop();
+    _saveHighScore();
+
+    // Show game over dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Game Over'),
+        content: Text('Your score: $score'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Main Menu'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _restartGame();
+            },
+            child: const Text('Play Again'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _restartGame() {
+    setState(() {
+      isGameOver = false;
+      score = 0;
+      gameBoard = List.generate(
+          boardHeight, (_) => List.generate(boardWidth, (_) => 0));
+      currentPiece = Tetromino.getRandom();
+      nextPiece = Tetromino.getRandom();
+    });
+
+    gameTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (!isGameOver) {
+        moveDown();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get the high score from the bloc
-    final scoreState = context.watch<ScoreBloc>().state;
-    final highScore = scoreState.highScore;
-
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Flutter Tetris'),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.refresh),
-      //       onPressed: resetGame,
-      //     ),
-      //   ],
-      // ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 20,
+      appBar: AppBar(
+        title: const Text('Tetris'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: isGameOver
+                ? null
+                : () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Restart Game?'),
+                        content: const Text(
+                            'Are you sure you want to restart? Your current progress will be lost.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _restartGame();
+                            },
+                            child: const Text('Restart'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
           ),
-          ScoreBoard(score: score, highScore: highScore),
-          Expanded(
-            child: Row(
+        ],
+      ),
+      body: BlocBuilder<ScoreBloc, ScoreState>(
+        builder: (context, state) {
+          return SafeArea(
+            child: Column(
               children: [
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 3,
-                  child: GameBoard(
-                    board: gameBoard,
-                    currentPiece: currentPiece,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ScoreBoard(
+                    score: score,
+                    highScore: state.highScore,
                   ),
                 ),
-                const SizedBox(width: 10),
                 Expanded(
-                  flex: 1,
-                  child: Column(
+                  child: Center(
+                    child: GameBoard(
+                      board: gameBoard,
+                      currentPiece: currentPiece,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       NextPiece(piece: nextPiece),
-                      const SizedBox(height: 20),
-                      // if (isGameOver)
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
                       ElevatedButton(
-                        onPressed: resetGame,
-                        style: ButtonStyle(
-                            backgroundColor:
-                                const WidgetStatePropertyAll(Colors.cyan),
-                            shape: WidgetStateProperty.all<LinearBorder>(
-                              const LinearBorder(),
-                            )),
-                        child: const Text(
-                          'New Game',
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
+                        onPressed: moveLeft,
+                        child: const Icon(Icons.arrow_left),
+                      ),
+                      ElevatedButton(
+                        onPressed: rotate,
+                        child: const Icon(Icons.rotate_right),
+                      ),
+                      ElevatedButton(
+                        onPressed: moveRight,
+                        child: const Icon(Icons.arrow_right),
+                      ),
+                      GestureDetector(
+                        onTapDown: (_) => startFastDrop(),
+                        onTapUp: (_) => cancelFastDrop(),
+                        onTapCancel: cancelFastDrop,
+                        child: ElevatedButton(
+                          onPressed: null,
+                          child: const Icon(Icons.arrow_drop_down),
                         ),
+                      ),
+                      ElevatedButton(
+                        onPressed: hardDrop,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: const Icon(Icons.arrow_downward),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
               ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Move Left Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_left, color: Colors.white),
-                  onPressed: moveLeft,
-                  iconSize: 60,
-                ),
-              ),
-
-              // Move Right Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_right, color: Colors.white),
-                  onPressed: moveRight,
-                  iconSize: 60,
-                ),
-              ),
-
-              // Rotate Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.rotate_right, color: Colors.white),
-                  onPressed: rotate,
-                  iconSize: 60,
-                ),
-              ),
-
-              // Move Down Button - Fancy Style
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.orange, Colors.red],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(30),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onLongPress: startFastDrop,
-                  onLongPressUp: cancelFastDrop,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.keyboard_double_arrow_down,
-                      color: Colors.white,
-                    ),
-                    onPressed: moveDown,
-                    iconSize: 65,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          )
-        ],
+          );
+        },
       ),
     );
   }
