@@ -13,19 +13,23 @@ class ScoreBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+      padding: const EdgeInsets.all(10.0),
+      margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: const [
+        color: Colors.black,
+        border: Border.all(
+          color: Colors.green,
+          width: 2.0,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 4.0,
-            offset: Offset(0, 2),
-          )
+            color: Colors.green.withAlpha(30),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      margin: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -35,16 +39,21 @@ class ScoreBoard extends StatelessWidget {
               const Text(
                 'SCORE',
                 style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+                  fontFamily: 'PressStart2P',
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.green,
+                  letterSpacing: 1,
                 ),
               ),
               Text(
                 '$score',
                 style: const TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  fontFamily: 'PressStart2P',
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.green,
+                  letterSpacing: 1,
                 ),
               ),
             ],
@@ -55,16 +64,21 @@ class ScoreBoard extends StatelessWidget {
               const Text(
                 'HIGH SCORE',
                 style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+                  fontFamily: 'PressStart2P',
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.green,
+                  letterSpacing: 1,
                 ),
               ),
               Text(
                 '${highScore ?? 0}',
                 style: const TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
+                  fontFamily: 'PressStart2P',
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.green,
+                  letterSpacing: 1,
                 ),
               ),
             ],

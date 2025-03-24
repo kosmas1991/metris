@@ -13,17 +13,33 @@ class GameBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: board[0].length / board.length, // Width / Height
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2.0),
-          color: Colors.black12,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.green,
+          width: 4.0,
         ),
-        child: CustomPaint(
-          painter: _GameBoardPainter(
-            board: board,
-            currentPiece: currentPiece,
+        color: Colors.black,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withAlpha(30),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: AspectRatio(
+        aspectRatio: board[0].length / board.length, // Width / Height
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black, width: 2.0),
+            color: Colors.black12,
+          ),
+          child: CustomPaint(
+            painter: _GameBoardPainter(
+              board: board,
+              currentPiece: currentPiece,
+            ),
           ),
         ),
       ),

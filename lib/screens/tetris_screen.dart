@@ -34,11 +34,22 @@ class _TetrisScreenState extends State<TetrisScreen> {
   void initState() {
     super.initState();
     initGame();
+    // Load the current high score from the bloc
+    highScore = context.read<ScoreBloc>().state.highScore;
+    // Just update the current score on init
     context.read<ScoreBloc>().add(UpdateScore(score));
   }
 
   void _saveHighScore() {
-    context.read<ScoreBloc>().add(UpdateScore(score));
+    // Check if current score is higher than high score
+    if (score > highScore) {
+      highScore = score;
+      // Update both score and high score using the existing UpdateScore event
+      context.read<ScoreBloc>().add(UpdateScore(highScore));
+    } else {
+      // Still update the current score
+      context.read<ScoreBloc>().add(UpdateScore(score));
+    }
   }
 
   void initGame() {
@@ -60,9 +71,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
   @override
   void dispose() {
-    _saveHighScore();
+    // _saveHighScore();
     gameTimer.cancel();
-    cancelFastDrop();
+    // cancelFastDrop();
     super.dispose();
   }
 
@@ -119,6 +130,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
         setState(() {
           isGameOver = true;
         });
+        _saveHighScore(); // Save high score when game is over
         gameTimer.cancel();
         cancelFastDrop();
       }
@@ -202,6 +214,12 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
         // Update the score in the bloc
         context.read<ScoreBloc>().add(UpdateScore(score));
+
+        // Check if we need to update high score
+        if (score > highScore) {
+          highScore = score;
+          context.read<ScoreBloc>().add(UpdateHighScore(highScore));
+        }
       });
     }
   }
@@ -225,20 +243,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the high score from the bloc
-    final scoreState = context.watch<ScoreBloc>().state;
-    final highScore = scoreState.highScore;
-
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Flutter Tetris'),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.refresh),
-      //       onPressed: resetGame,
-      //     ),
-      //   ],
-      // ),
       body: Column(
         children: [
           const SizedBox(
@@ -251,9 +256,24 @@ class _TetrisScreenState extends State<TetrisScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   flex: 3,
-                  child: GameBoard(
-                    board: gameBoard,
-                    currentPiece: currentPiece,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.green,
+                        width: 4.0,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withAlpha(30),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: GameBoard(
+                      board: gameBoard,
+                      currentPiece: currentPiece,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -265,21 +285,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
                       NextPiece(piece: nextPiece),
                       const SizedBox(height: 20),
                       // if (isGameOver)
-                      ElevatedButton(
+                      _buildRetroButton(
+                        'NEW GAME',
                         onPressed: resetGame,
-                        style: ButtonStyle(
-                            backgroundColor:
-                                const WidgetStatePropertyAll(Colors.cyan),
-                            shape: WidgetStateProperty.all<LinearBorder>(
-                              const LinearBorder(),
-                            )),
-                        child: const Text(
-                          'New Game',
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
                       ),
                     ],
                   ),
@@ -292,82 +300,29 @@ class _TetrisScreenState extends State<TetrisScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Move Left Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_left, color: Colors.white),
-                  onPressed: moveLeft,
-                  iconSize: 60,
-                ),
+              _buildRetroControlButton(
+                Icons.arrow_left,
+                onPressed: moveLeft,
               ),
 
               // Move Right Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_right, color: Colors.white),
-                  onPressed: moveRight,
-                  iconSize: 60,
-                ),
+              _buildRetroControlButton(
+                Icons.arrow_right,
+                onPressed: moveRight,
               ),
 
               // Rotate Button
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.rotate_right, color: Colors.white),
-                  onPressed: rotate,
-                  iconSize: 60,
-                ),
+              _buildRetroControlButton(
+                Icons.rotate_right,
+                onPressed: rotate,
               ),
 
-              // Move Down Button - Fancy Style
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.orange, Colors.red],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(30),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onLongPress: startFastDrop,
-                  onLongPressUp: cancelFastDrop,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.keyboard_double_arrow_down,
-                      color: Colors.white,
-                    ),
-                    onPressed: moveDown,
-                    iconSize: 65,
-                  ),
-                ),
+              // Move Down Button
+              _buildRetroSpecialButton(
+                Icons.keyboard_double_arrow_down,
+                onPressed: moveDown,
+                onLongPress: startFastDrop,
+                onLongPressUp: cancelFastDrop,
               ),
             ],
           ),
@@ -375,6 +330,111 @@ class _TetrisScreenState extends State<TetrisScreen> {
             height: 10,
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildRetroControlButton(IconData icon,
+      {required VoidCallback onPressed}) {
+    return Container(
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        border: Border.all(
+          color: Colors.green,
+          width: 3.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withAlpha(50),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          child: Icon(
+            icon,
+            color: Colors.green,
+            size: 40,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRetroSpecialButton(
+    IconData icon, {
+    required VoidCallback onPressed,
+    required VoidCallback onLongPress,
+    required VoidCallback onLongPressUp,
+  }) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        border: Border.all(
+          color: Colors.green,
+          width: 3.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withAlpha(70),
+            blurRadius: 8,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        onLongPressUp: onLongPressUp,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            child: Icon(
+              icon,
+              color: Colors.green,
+              size: 50,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRetroButton(String text, {required VoidCallback onPressed}) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(color: Colors.green, width: 3),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withAlpha(50),
+              spreadRadius: 1,
+              blurRadius: 5,
+            ),
+          ],
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontFamily: 'PressStart2P',
+            fontSize: 14,
+            color: Colors.green,
+            fontWeight: FontWeight.normal,
+            letterSpacing: 1,
+          ),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

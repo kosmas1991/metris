@@ -16,6 +16,15 @@ class UpdateScore extends ScoreEvent {
   List<Object> get props => [score];
 }
 
+class UpdateHighScore extends ScoreEvent {
+  final int highScore;
+
+  UpdateHighScore(this.highScore);
+
+  @override
+  List<Object> get props => [highScore];
+}
+
 class ResetScore extends ScoreEvent {}
 
 // State
@@ -60,6 +69,7 @@ class ScoreBloc extends HydratedBloc<ScoreEvent, ScoreState> {
   ScoreBloc() : super(const ScoreState()) {
     on<UpdateScore>(_onUpdateScore);
     on<ResetScore>(_onResetScore);
+    on<UpdateHighScore>(_onUpdateHighScore);
   }
 
   void _onUpdateScore(UpdateScore event, Emitter<ScoreState> emit) {
@@ -73,6 +83,10 @@ class ScoreBloc extends HydratedBloc<ScoreEvent, ScoreState> {
 
   void _onResetScore(ResetScore event, Emitter<ScoreState> emit) {
     emit(state.copyWith(currentScore: 0));
+  }
+
+  void _onUpdateHighScore(UpdateHighScore event, Emitter<ScoreState> emit) {
+    emit(state.copyWith(highScore: event.highScore));
   }
 
   @override

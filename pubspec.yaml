@@ -34,3 +34,8 @@ flutter:
   assets:
     - assets/images/
     - assets/audio/
+  
+  fonts:
+    - family: PressStart2P
+      fonts:
+        - asset: assets/fonts/PressStart2P-Regular.ttf

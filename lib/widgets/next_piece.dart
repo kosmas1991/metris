@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tetromino.dart';
 
 class NextPiece extends StatelessWidget {
-  final Tetromino piece;
+  final dynamic piece;
 
   const NextPiece({
     super.key,
@@ -11,25 +11,49 @@ class NextPiece extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          'Next',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.green,
+          width: 2.0,
         ),
-        const SizedBox(height: 10),
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-            color: Colors.black12,
+        color: Colors.black,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withAlpha(30),
+            blurRadius: 5,
+            spreadRadius: 1,
           ),
-          child: CustomPaint(
-            painter: _NextPiecePainter(piece: piece),
+        ],
+      ),
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'NEXT',
+            style: TextStyle(
+              fontFamily: 'PressStart2P',
+              fontSize: 16,
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              color: Colors.black12,
+            ),
+            child: CustomPaint(
+              painter: _NextPiecePainter(piece: piece),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
