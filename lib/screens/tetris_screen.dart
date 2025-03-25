@@ -31,6 +31,12 @@ class _TetrisScreenState extends State<TetrisScreen> {
   Timer? fastDropTimer;
   bool isHoldingDown = false;
 
+  // New variables for continuous left/right movement
+  Timer? moveLeftTimer;
+  Timer? moveRightTimer;
+  bool isMovingLeft = false;
+  bool isMovingRight = false;
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +80,12 @@ class _TetrisScreenState extends State<TetrisScreen> {
   void dispose() {
     // _saveHighScore();
     gameTimer.cancel();
+    fastDropTimer?.cancel();
+    moveLeftTimer?.cancel();
+    moveRightTimer?.cancel();
     // cancelFastDrop();
+    // cancelMoveLeft();
+    // cancelMoveRight();
     super.dispose();
   }
 
@@ -160,6 +171,60 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
     setState(() {
       isHoldingDown = false;
+    });
+  }
+
+  // New method to start continuous left movement
+  void startMoveLeft() {
+    if (isGameOver || isMovingLeft) return;
+
+    setState(() {
+      isMovingLeft = true;
+    });
+
+    // Move once immediately
+    moveLeft();
+
+    // Create a timer that moves the piece left quickly
+    moveLeftTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      moveLeft();
+    });
+  }
+
+  // New method to cancel continuous left movement
+  void cancelMoveLeft() {
+    moveLeftTimer?.cancel();
+    moveLeftTimer = null;
+
+    setState(() {
+      isMovingLeft = false;
+    });
+  }
+
+  // New method to start continuous right movement
+  void startMoveRight() {
+    if (isGameOver || isMovingRight) return;
+
+    setState(() {
+      isMovingRight = true;
+    });
+
+    // Move once immediately
+    moveRight();
+
+    // Create a timer that moves the piece right quickly
+    moveRightTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      moveRight();
+    });
+  }
+
+  // New method to cancel continuous right movement
+  void cancelMoveRight() {
+    moveRightTimer?.cancel();
+    moveRightTimer = null;
+
+    setState(() {
+      isMovingRight = false;
     });
   }
 
@@ -302,15 +367,19 @@ class _TetrisScreenState extends State<TetrisScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Move Left Button
-              _buildRetroControlButton(
+              _buildRetroSpecialButton(
                 Icons.arrow_left,
                 onPressed: moveLeft,
+                onLongPress: startMoveLeft,
+                onLongPressUp: cancelMoveLeft,
               ),
 
               // Move Right Button
-              _buildRetroControlButton(
+              _buildRetroSpecialButton(
                 Icons.arrow_right,
                 onPressed: moveRight,
+                onLongPress: startMoveRight,
+                onLongPressUp: cancelMoveRight,
               ),
 
               // Rotate Button
@@ -358,7 +427,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: onPressed,
+          onTapDown: (_) => onPressed(), // Execute on press down instead of tap
           child: Icon(
             icon,
             color: Colors.green,
@@ -398,7 +467,8 @@ class _TetrisScreenState extends State<TetrisScreen> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: onPressed,
+            onTapDown: (_) =>
+                onPressed(), // Execute on press down instead of tap
             child: Icon(
               icon,
               color: Colors.green,
@@ -412,7 +482,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
 
   Widget _buildRetroButton(String text, {required VoidCallback onPressed}) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: onPressed, // Keep this as onTap since it's for menu buttons
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: BoxDecoration(
