@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'tetris_screen.dart';
 import 'settings_screen.dart';
@@ -14,7 +14,6 @@ class HomeScreen extends StatelessWidget {
         child: Scaffold(
           backgroundColor: Colors.black,
           body: Container(
-            width: kIsWeb ? double.infinity : 450,
             decoration: const BoxDecoration(
               gradient: RadialGradient(
                 colors: [Color.fromARGB(255, 18, 158, 42), Colors.black],
