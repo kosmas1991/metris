@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,13 +16,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final storage = await HydratedStorage.build(
-    storageDirectory: await getTemporaryDirectory(),
+  final HydratedStorage storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory // Correct storage for web
+        : await getTemporaryDirectory(), // Correct storage for other platforms
   );
+
   HydratedBloc.storage = storage;
+
+  // Lock orientation to portrait
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
   runApp(const MyApp());
 }
 
@@ -47,7 +54,8 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Metris',
+        
+        title: 'TETRIS',
         theme: ThemeData(
           useMaterial3: false,
           scaffoldBackgroundColor: Colors.black,

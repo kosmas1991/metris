@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Add this import for key handling
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/tetromino.dart';
 import '../widgets/game_board.dart';
@@ -16,6 +18,9 @@ class TetrisScreen extends StatefulWidget {
 }
 
 class _TetrisScreenState extends State<TetrisScreen> {
+  // Focus node to handle keyboard inputs
+  final FocusNode _focusNode = FocusNode();
+
   static const int boardWidth = 10;
   static const int boardHeight = 20;
 
@@ -83,9 +88,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
     fastDropTimer?.cancel();
     moveLeftTimer?.cancel();
     moveRightTimer?.cancel();
-    // cancelFastDrop();
-    // cancelMoveLeft();
-    // cancelMoveRight();
+    _focusNode.dispose(); // Dispose the focus node
     super.dispose();
   }
 
@@ -308,99 +311,156 @@ class _TetrisScreenState extends State<TetrisScreen> {
     context.read<ScoreBloc>().add(ResetScore());
   }
 
+  // Handle keyboard input
+  void _handleKeyEvent(RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.arrowLeft:
+          moveLeft();
+          break;
+        case LogicalKeyboardKey.arrowRight:
+          moveRight();
+          break;
+        case LogicalKeyboardKey.arrowDown:
+          moveDown();
+          break;
+        case LogicalKeyboardKey.arrowUp:
+        case LogicalKeyboardKey.space:
+          rotate();
+          break;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 20,
+    return Center(
+      child: SizedBox(
+        width: 450,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('BACK'),
           ),
-          ScoreBoard(score: score, highScore: highScore),
-          Expanded(
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 3,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.green,
-                        width: 4.0,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withAlpha(30),
-                          blurRadius: 8,
-                          spreadRadius: 1,
+          body: RawKeyboardListener(
+            focusNode: _focusNode,
+            onKey: _handleKeyEvent,
+            autofocus: true,
+            child: GestureDetector(
+              // Make sure we keep focus when tapping anywhere on the screen
+              onTap: () {
+                if (!_focusNode.hasFocus) {
+                  FocusScope.of(context).requestFocus(_focusNode);
+                }
+              },
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  ScoreBoard(score: score, highScore: highScore),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.green,
+                                width: 4.0,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green.withAlpha(30),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: GameBoard(
+                              board: gameBoard,
+                              currentPiece: currentPiece,
+                            ),
+                          ),
                         ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              NextPiece(piece: nextPiece),
+                              const SizedBox(height: 20),
+                              // if (isGameOver)
+                              _buildRetroButton(
+                                'NEW GAME',
+                                onPressed: resetGame,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
                       ],
                     ),
-                    child: GameBoard(
-                      board: gameBoard,
-                      currentPiece: currentPiece,
-                    ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      NextPiece(piece: nextPiece),
-                      const SizedBox(height: 20),
-                      // if (isGameOver)
-                      _buildRetroButton(
-                        'NEW GAME',
-                        onPressed: resetGame,
+                      // Move Left Button
+                      _buildRetroSpecialButton(
+                        Icons.arrow_left,
+                        onPressed: moveLeft,
+                        onLongPress: startMoveLeft,
+                        onLongPressUp: cancelMoveLeft,
+                      ),
+
+                      // Move Right Button
+                      _buildRetroSpecialButton(
+                        Icons.arrow_right,
+                        onPressed: moveRight,
+                        onLongPress: startMoveRight,
+                        onLongPressUp: cancelMoveRight,
+                      ),
+
+                      // Rotate Button
+                      _buildRetroControlButton(
+                        Icons.rotate_right,
+                        onPressed: rotate,
+                      ),
+
+                      // Move Down Button
+                      _buildRetroSpecialButton(
+                        Icons.keyboard_double_arrow_down,
+                        onPressed: moveDown,
+                        onLongPress: startFastDrop,
+                        onLongPressUp: cancelFastDrop,
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 10),
-              ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // Add a small text hint about keyboard controls
+                  kIsWeb
+                      ? const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            'USE ARROW KEYS OR SPACE TO PLAY',
+                            style: TextStyle(
+                              fontFamily: 'PressStart2P',
+                              fontSize: 8,
+                              color: Colors.green,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Move Left Button
-              _buildRetroSpecialButton(
-                Icons.arrow_left,
-                onPressed: moveLeft,
-                onLongPress: startMoveLeft,
-                onLongPressUp: cancelMoveLeft,
-              ),
-
-              // Move Right Button
-              _buildRetroSpecialButton(
-                Icons.arrow_right,
-                onPressed: moveRight,
-                onLongPress: startMoveRight,
-                onLongPressUp: cancelMoveRight,
-              ),
-
-              // Rotate Button
-              _buildRetroControlButton(
-                Icons.rotate_right,
-                onPressed: rotate,
-              ),
-
-              // Move Down Button
-              _buildRetroSpecialButton(
-                Icons.keyboard_double_arrow_down,
-                onPressed: moveDown,
-                onLongPress: startFastDrop,
-                onLongPressUp: cancelFastDrop,
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          )
-        ],
+        ),
       ),
     );
   }

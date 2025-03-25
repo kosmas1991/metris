@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'tetris_screen.dart';
 import 'settings_screen.dart';
@@ -7,71 +8,77 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            colors: [Color.fromARGB(255, 18, 158, 42), Colors.black],
-            radius: 1.0,
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.green,
-                    width: 4,
-                  ),
-                  color: Colors.black,
-                ),
-                child: Text(
-                  'METRIS',
-                  style: TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 40,
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 5,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 10.0,
-                        color: Colors.green.shade700,
-                        offset: const Offset(2, 2),
+    return Center(
+      child: SizedBox(
+        width: 450,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Container(
+            width: kIsWeb ? double.infinity : 450,
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                colors: [Color.fromARGB(255, 18, 158, 42), Colors.black],
+                radius: 1.0,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.green,
+                        width: 4,
                       ),
-                    ],
+                      color: Colors.black,
+                    ),
+                    child: Text(
+                      'TETRIS',
+                      style: TextStyle(
+                        fontFamily: 'PressStart2P',
+                        fontSize: 40,
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 5,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10.0,
+                            color: Colors.green.shade700,
+                            offset: const Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 100),
+                  _buildRetroButton(
+                    'PLAY',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TetrisScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  _buildRetroButton(
+                    'SETTINGS',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 100),
-              _buildRetroButton(
-                'PLAY',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const TetrisScreen(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 30),
-              _buildRetroButton(
-                'SETTINGS',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
         ),
       ),

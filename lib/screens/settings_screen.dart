@@ -15,98 +15,108 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text(
-          'SETTINGS',
-          style: TextStyle(
-            fontFamily: 'PressStart2P',
-            letterSpacing: 2,
-            fontWeight: FontWeight.bold,
+    return Center(
+      child: SizedBox(
+        width: 450,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            title: const Text(
+              'SETTINGS',
+              style: TextStyle(
+                fontFamily: 'PressStart2P',
+                letterSpacing: 2,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.green,
+            elevation: 0,
           ),
-        ),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.green,
-        elevation: 0,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.green, width: 2),
-          color: Colors.black,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.green.withAlpha(20),
-              blurRadius: 10,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        margin: const EdgeInsets.all(20),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'GAME OPTIONS',
-              style: TextStyle(
-                fontFamily: 'PressStart2P',
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
-                color: Colors.green,
-                letterSpacing: 1,
+          body: Center(
+            child: Container(
+              width: 450,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.green, width: 2),
+                color: Colors.black,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.green.withAlpha(20),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'GAME OPTIONS',
+                    style: TextStyle(
+                      fontFamily: 'PressStart2P',
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.green,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildRetroSwitch(
+                    title: 'SOUND',
+                    value: _soundEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _soundEnabled = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'DIFFICULTY',
+                    style: TextStyle(
+                      fontFamily: 'PressStart2P',
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.green,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildRetroSlider(
+                    value: _difficulty,
+                    onChanged: (value) {
+                      setState(() {
+                        _difficulty = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  BlocBuilder<RotationBloc, RotationState>(
+                    builder: (context, state) {
+                      return _buildRetroSwitch(
+                        title: 'ROTATION CLOCKWISE',
+                        value: state.isClockwise,
+                        onChanged: (value) {
+                          context
+                              .read<RotationBloc>()
+                              .add(ToggleRotationDirection());
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  _buildRetroButton(
+                    'BACK',
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            _buildRetroSwitch(
-              title: 'SOUND',
-              value: _soundEnabled,
-              onChanged: (value) {
-                setState(() {
-                  _soundEnabled = value;
-                });
-              },
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              'DIFFICULTY',
-              style: TextStyle(
-                fontFamily: 'PressStart2P',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Colors.green,
-                letterSpacing: 1,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildRetroSlider(
-              value: _difficulty,
-              onChanged: (value) {
-                setState(() {
-                  _difficulty = value;
-                });
-              },
-            ),
-            const SizedBox(height: 30),
-            BlocBuilder<RotationBloc, RotationState>(
-              builder: (context, state) {
-                return _buildRetroSwitch(
-                  title: 'ROTATION CLOCKWISE',
-                  value: state.isClockwise,
-                  onChanged: (value) {
-                    context.read<RotationBloc>().add(ToggleRotationDirection());
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 40),
-            _buildRetroButton(
-              'BACK',
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
