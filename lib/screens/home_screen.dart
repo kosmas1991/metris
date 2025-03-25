@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
                   'METRIS',
                   style: TextStyle(
                     fontFamily: 'PressStart2P',
-                    fontSize: 48,
+                    fontSize: 40,
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 5,

@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:metris/firebase_options.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'blocs/score_bloc.dart';
@@ -10,10 +12,12 @@ import 'screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final storage = await HydratedStorage.build(
     storageDirectory: await getTemporaryDirectory(),
   );
-
   HydratedBloc.storage = storage;
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -26,6 +30,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set the system UI overlay style
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black, // Change the status bar color
+      systemNavigationBarColor: Colors.black, // Change the navigation bar color
+      systemNavigationBarIconBrightness:
+          Brightness.light, // Change icon brightness
+    ));
     return MultiBlocProvider(
       providers: [
         BlocProvider(
