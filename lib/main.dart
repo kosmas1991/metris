@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'blocs/score_bloc.dart';
+import 'blocs/rotation_bloc.dart';
 import 'screens/home_screen.dart';
 
 void main() async {
@@ -24,8 +26,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ScoreBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => ScoreBloc(),
+        ),
+        BlocProvider(
+          create: (_) => RotationBloc(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Metris',
         theme: ThemeData(
@@ -75,8 +84,7 @@ class MyApp extends StatelessWidget {
           iconButtonTheme: IconButtonThemeData(
             style: ButtonStyle(
               foregroundColor: WidgetStateProperty.all(Colors.green),
-              overlayColor:
-                  WidgetStateProperty.all(Colors.green.withAlpha(20)),
+              overlayColor: WidgetStateProperty.all(Colors.green.withAlpha(20)),
             ),
           ),
         ),

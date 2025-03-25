@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "295741379623",
+    "firebase_url": "https://metris2app-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "metris2app",
+    "storage_bucket": "metris2app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295741379623:android:953769214e9bb6d92aaa02",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295741379623-fnnprp3bfbpnj9malaf5vrts484mj0qu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_application_2",
+            "certificate_hash": "8bd91a38b50c45aaf819024523f579c76d69ff97"
+          }
+        },
+        {
+          "client_id": "295741379623-oiadlcf50bt6kb1310642chidvb3bdcn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_application_2",
+            "certificate_hash": "8418dcaf22c420445cb502037fb98b41d46440b5"
+          }
+        },
+        {
+          "client_id": "295741379623-v7ufhhpvvdvpe4q844m2fl2d4oevca4j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvbBbIOxzjzhnYuEzrFQqI8ee5FKrSszQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295741379623-v7ufhhpvvdvpe4q844m2fl2d4oevca4j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "295741379623-rg6br22t8g61j3fe0p7aqfons939muk3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterApplication2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

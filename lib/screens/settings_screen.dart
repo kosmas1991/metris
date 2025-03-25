@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/rotation_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -85,6 +87,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
             ),
+            const SizedBox(height: 30),
+            BlocBuilder<RotationBloc, RotationState>(
+              builder: (context, state) {
+                return _buildRetroSwitch(
+                  title: 'ROTATION CLOCKWISE',
+                  value: state.isClockwise,
+                  onChanged: (value) {
+                    context.read<RotationBloc>().add(ToggleRotationDirection());
+                  },
+                );
+              },
+            ),
             const SizedBox(height: 40),
             _buildRetroButton(
               'BACK',
@@ -106,13 +120,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontFamily: 'PressStart2P',
-            fontSize: 14,
-            color: Colors.green,
-            letterSpacing: 1,
+        SizedBox(
+          width: 200,
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'PressStart2P',
+              fontSize: 14,
+              color: Colors.green,
+              letterSpacing: 1,
+            ),
           ),
         ),
         GestureDetector(

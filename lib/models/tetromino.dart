@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../blocs/rotation_bloc.dart';
 
 class Tetromino {
   int type;
@@ -115,9 +116,29 @@ class Tetromino {
     return rotated;
   }
 
-  void rotate() {
+  void rotate(RotationState rotationState) {
+    if (rotationState.isClockwise) {
+      rotateClockwise();
+    } else {
+      rotateCounterClockwise();
+    }
+  }
+
+  void rotateClockwise() {
     int prevRotation = rotation;
     rotation = (rotation + 1) % 4;
+    _updatePositions();
+
+    if (!isValidPosition()) {
+      rotation = prevRotation;
+      _updatePositions();
+    }
+  }
+
+  void rotateCounterClockwise() {
+    int prevRotation = rotation;
+    rotation = (rotation - 1) % 4;
+    if (rotation < 0) rotation += 4;
     _updatePositions();
 
     if (!isValidPosition()) {

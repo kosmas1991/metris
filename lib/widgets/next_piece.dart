@@ -34,7 +34,7 @@ class NextPiece extends StatelessWidget {
             'NEXT',
             style: TextStyle(
               fontFamily: 'PressStart2P',
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.green,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,

@@ -6,6 +6,7 @@ import '../widgets/game_board.dart';
 import '../widgets/next_piece.dart';
 import '../widgets/score_board.dart';
 import '../blocs/score_bloc.dart';
+import '../blocs/rotation_bloc.dart';
 
 class TetrisScreen extends StatefulWidget {
   const TetrisScreen({super.key});
@@ -100,9 +101,10 @@ class _TetrisScreenState extends State<TetrisScreen> {
   void rotate() {
     if (isGameOver) return;
 
+    final rotationState = context.read<RotationBloc>().state;
     if (currentPiece.canRotate(gameBoard)) {
       setState(() {
-        currentPiece.rotate();
+        currentPiece.rotate(rotationState);
       });
     }
   }
@@ -428,7 +430,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
           text,
           style: const TextStyle(
             fontFamily: 'PressStart2P',
-            fontSize: 14,
+            fontSize: 12,
             color: Colors.green,
             fontWeight: FontWeight.normal,
             letterSpacing: 1,
