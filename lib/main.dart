@@ -54,7 +54,6 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        
         title: 'TETRIS',
         theme: ThemeData(
           useMaterial3: false,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Add this import for key handling
@@ -42,6 +43,10 @@ class _TetrisScreenState extends State<TetrisScreen> {
   bool isMovingLeft = false;
   bool isMovingRight = false;
 
+  // Garbage line variables
+  int garbageQueue = 0;
+  int garbageGapColumn = 0;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +55,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
     highScore = context.read<ScoreBloc>().state.highScore;
     // Just update the current score on init
     context.read<ScoreBloc>().add(UpdateScore(score));
+
+    // Initialize random gap column for garbage
+    garbageGapColumn = Random().nextInt(boardWidth);
   }
 
   void _saveHighScore() {
@@ -133,6 +141,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
     } else {
       // Lock the piece in place
       placePiece();
+
+      // Add garbage lines if there are any queued
+      addGarbageLines();
 
       // Check for completed lines
       checkLines();
@@ -294,6 +305,43 @@ class _TetrisScreenState extends State<TetrisScreen> {
     }
   }
 
+  // Add garbage lines function
+  void addGarbageLines() {
+    if (garbageQueue <= 0) return;
+
+    setState(() {
+      // How many garbage lines to add this turn (all queued lines)
+      int linesToAdd = garbageQueue;
+
+      // Remove rows from the top to make room for garbage
+      for (int i = 0; i < linesToAdd; i++) {
+        gameBoard.removeAt(0);
+      }
+
+      // Add garbage lines at the bottom
+      for (int i = 0; i < linesToAdd; i++) {
+        List<int> garbageLine = List.generate(
+            boardWidth,
+            (index) =>
+                index == garbageGapColumn ? 0 : 8 // Use 8 as garbage block type
+            );
+        gameBoard.add(garbageLine);
+      }
+
+      // Reset the garbage queue
+      garbageQueue = 0;
+    });
+  }
+
+  // Queue garbage lines (called when garbage buttons are pressed)
+  void queueGarbageLines(int lines) {
+    if (isGameOver) return;
+
+    setState(() {
+      garbageQueue += lines;
+    });
+  }
+
   void resetGame() {
     // Save high score before resetting
     _saveHighScore();
@@ -305,6 +353,8 @@ class _TetrisScreenState extends State<TetrisScreen> {
       initGame();
       score = 0;
       isGameOver = false;
+      garbageQueue = 0;
+      garbageGapColumn = Random().nextInt(boardWidth);
     });
 
     // Reset current score in bloc but keep high score
@@ -392,11 +442,13 @@ class _TetrisScreenState extends State<TetrisScreen> {
                             children: [
                               NextPiece(piece: nextPiece),
                               const SizedBox(height: 20),
-                              // if (isGameOver)
                               _buildRetroButton(
                                 'NEW GAME',
                                 onPressed: resetGame,
                               ),
+                              const SizedBox(height: 20),
+                              // Garbage buttons
+                              _buildGarbageButtons(),
                             ],
                           ),
                         ),
@@ -459,6 +511,76 @@ class _TetrisScreenState extends State<TetrisScreen> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widget to build the garbage buttons
+  Widget _buildGarbageButtons() {
+    return Column(
+      children: [
+        const Text(
+          'ADD GARBAGE',
+          style: TextStyle(
+            fontFamily: 'PressStart2P',
+            fontSize: 10,
+            color: Colors.green,
+            letterSpacing: 1,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildGarbageButton('1', () => queueGarbageLines(1)),
+            const SizedBox(width: 8),
+            _buildGarbageButton('2', () => queueGarbageLines(2)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildGarbageButton('3', () => queueGarbageLines(3)),
+            const SizedBox(width: 8),
+            _buildGarbageButton('4', () => queueGarbageLines(4)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Widget for the individual garbage buttons
+  Widget _buildGarbageButton(String text, VoidCallback onPressed) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          border: Border.all(color: Colors.green, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withAlpha(50),
+              spreadRadius: 1,
+              blurRadius: 3,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontFamily: 'PressStart2P',
+              fontSize: 14,
+              color: Colors.green,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
           ),
         ),
       ),

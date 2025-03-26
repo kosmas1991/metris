@@ -72,9 +72,19 @@ class _GameBoardPainter extends CustomPainter {
             cellHeight,
           );
 
+          // Use a specific color for garbage blocks (type 8)
+          // Otherwise use the tetromino colors
+          Color blockColor;
+          if (board[y][x] == 8) {
+            // Gray color for garbage blocks
+            blockColor = Colors.grey.shade700;
+          } else {
+            blockColor = Tetromino.colors[board[y][x]];
+          }
+
           canvas.drawRect(
             rect,
-            Paint()..color = Tetromino.colors[board[y][x]],
+            Paint()..color = blockColor,
           );
 
           // Draw cell border
