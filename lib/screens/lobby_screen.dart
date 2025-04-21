@@ -131,14 +131,18 @@ class _LobbyScreenState extends State<LobbyScreen> {
                               border: Border.all(color: Colors.green, width: 2),
                             ),
                             child: ListTile(
-                              leading:
-                                  const Icon(Icons.person, color: Colors.green),
+                              leading: const Icon(
+                                Icons.person,
+                                color: Colors.green,
+                                size: 40,
+                              ),
                               title: Text(
+                                maxLines: 1,
                                 user['username'] ?? '',
                                 style: const TextStyle(
                                   color: Colors.green,
                                   fontFamily: 'PressStart2P',
-                                  fontSize: 14,
+                                  fontSize: 10,
                                 ),
                               ),
                               subtitle: Text(
