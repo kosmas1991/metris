@@ -35,4 +35,6 @@ class UserLoginRequested extends UserEvent {
   List<Object?> get props => [username, password];
 }
 
+class UserAutoLoginRequested extends UserEvent {}
+
 class UserLogoutRequested extends UserEvent {}

@@ -12,6 +12,20 @@ class UserLoading extends UserState {}
 
 class UserRegisterSuccess extends UserState {}
 
+/// State to store user credentials for auto login
+class UserCredentials extends UserState {
+  final String username;
+  final String password;
+
+  const UserCredentials({
+    required this.username,
+    required this.password,
+  });
+
+  @override
+  List<Object?> get props => [username, password];
+}
+
 class UserAuthenticated extends UserState {
   final String accessToken;
   final String tokenType;

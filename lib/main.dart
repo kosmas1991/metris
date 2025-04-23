@@ -2,6 +2,8 @@ import 'imports/app_imports.dart';
 
 //adb reverse tcp:8000 tcp:8000
 
+//!    L E T ' S     G O    :-)
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");

@@ -13,6 +13,10 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     on<UserRegisterRequested>(_onRegisterRequested);
     on<UserLoginRequested>(_onLoginRequested);
     on<UserLogoutRequested>(_onLogoutRequested);
+    on<UserAutoLoginRequested>(_onAutoLoginRequested);
+    
+    // Automatically try to log in when bloc is created
+    add(UserAutoLoginRequested());
   }
 
   String get _baseUrl {
@@ -24,6 +28,35 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
   }
 
   String get _serverUrl => 'http://$_baseUrl:8000';
+
+  // Handle automatic login using stored credentials
+  Future<void> _onAutoLoginRequested(
+      UserAutoLoginRequested event, Emitter<UserState> emit) async {
+    // Check if we have stored credentials
+    final currentState = state;
+    
+    if (currentState is UserCredentials) {
+      // We have credentials, let's log in
+      add(UserLoginRequested(
+        username: currentState.username, 
+        password: currentState.password
+      ));
+    } 
+    // If we're already authenticated, refresh the token anyway
+    else if (currentState is UserAuthenticated) {
+      // Attempt to get credentials from storage directly
+      final json = await HydratedBloc.storage.read('credentials');
+      if (json != null) {
+        final credentials = jsonDecode(json);
+        if (credentials['username'] != null && credentials['password'] != null) {
+          add(UserLoginRequested(
+            username: credentials['username'], 
+            password: credentials['password']
+          ));
+        }
+      }
+    }
+  }
 
   Future<void> _onRegisterRequested(
       UserRegisterRequested event, Emitter<UserState> emit) async {
@@ -58,6 +91,14 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
   Future<void> _onLoginRequested(
       UserLoginRequested event, Emitter<UserState> emit) async {
     emit(UserLoading());
+    
+    // Store credentials for future auto-login (separate from state)
+    final credentials = jsonEncode({
+      'username': event.username,
+      'password': event.password,
+    });
+    await HydratedBloc.storage.write('credentials', credentials);
+    
     final url = Uri.parse('$_serverUrl/auth/token');
     final body = {
       'grant_type': 'password',
@@ -90,6 +131,14 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
         );
         if (userResponse.statusCode == 200) {
           final userData = jsonDecode(userResponse.body);
+          
+          // Store user credentials state (will be hydrated)
+          emit(UserCredentials(
+            username: event.username,
+            password: event.password,
+          ));
+          
+          // Then emit authenticated state with user data
           emit(UserAuthenticated(
             accessToken: accessToken,
             tokenType: tokenType,
@@ -115,7 +164,9 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
 
   void _onLogoutRequested(UserLogoutRequested event, Emitter<UserState> emit) {
     emit(UserInitial());
-    HydratedBloc.storage.delete('UserBloc'); // Remove persisted user data
+    // Delete both the UserBloc state and the credentials
+    HydratedBloc.storage.delete('UserBloc');
+    HydratedBloc.storage.delete('credentials');
   }
 
   @override
