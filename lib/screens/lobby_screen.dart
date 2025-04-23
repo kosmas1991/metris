@@ -155,13 +155,23 @@ class _LobbyScreenState extends State<LobbyScreen> {
           children: [
             const SizedBox(height: 16),
             const Center(
-              child: Text(
-                'Lobby Screen',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontFamily: 'PressStart2P',
-                  fontSize: 24,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Lobby',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontFamily: 'PressStart2P',
+                      fontSize: 24,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Icon(
+                    Icons.people,
+                    color: Colors.green,
+                  )
+                ],
               ),
             ),
             if (loggedInText != null)
