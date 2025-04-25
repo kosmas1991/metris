@@ -2,18 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:metris/screens/login_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/user_bloc.dart';
+import '../services/user_service.dart';
 import 'tetris_screen.dart';
 import 'lobby_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // Store win rate data
+  double? _winRate;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWinRate();
+  }
+
+  // Fetch win rate data when the user is authenticated
+  Future<void> _fetchWinRate() async {
+    final userState = context.read<UserBloc>().state;
+    if (userState is UserAuthenticated) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final winRateData = await UserService.getUserWinRate(
+        userState.id,
+        userState.accessToken,
+      );
+
+      if (winRateData != null) {
+        setState(() {
+          _winRate = winRateData['win_rate'];
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final userState = context.watch<UserBloc>().state;
     String? loggedInText;
     if (userState is UserAuthenticated) {
-      loggedInText = 'logged in as: ${userState.username} (${userState.id})';
+      loggedInText = 'logged in as: ${userState.username}';
+      if (_winRate != null) {
+        loggedInText += ' WR: ${_winRate!.toStringAsFixed(1)}%';
+      } else if (_isLoading) {
+        loggedInText += ' WR: loading...';
+      }
     }
     return SafeArea(
       child: Center(

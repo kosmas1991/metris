@@ -6,6 +6,7 @@ import 'package:metris/blocs/user_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../screens/online_tetris_screen.dart';
 import '../config/server_config.dart';
+import '../services/user_service.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -23,6 +24,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
   String? _token;
   String? _userId;
   String? _username;
+
+  // Win rate data
+  Map<int, double> _userWinRates = {};
+  Set<int> _loadingWinRates = {};
 
   // Room data
   String? _currentRoomId;
@@ -53,6 +58,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
         setState(() {
           _users = data['users'] ?? [];
         });
+
+        // Fetch win rates for all users
+        _fetchWinRatesForUsers();
       }, onError: (e) {
         // Optionally handle error
       }, onDone: () {
@@ -61,6 +69,32 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
       // Connect to own room automatically
       _joinRoom(_userId!);
+    }
+  }
+
+  // Fetch win rates for all users
+  void _fetchWinRatesForUsers() {
+    final userState = context.read<UserBloc>().state;
+    if (userState is UserAuthenticated) {
+      for (var user in _users) {
+        final userId = user['id'] as int;
+
+        // Only load win rate if we don't have it and aren't already loading it
+        if (!_userWinRates.containsKey(userId) &&
+            !_loadingWinRates.contains(userId)) {
+          _loadingWinRates.add(userId);
+
+          UserService.getUserWinRate(userId, userState.accessToken)
+              .then((winRateData) {
+            if (winRateData != null && mounted) {
+              setState(() {
+                _userWinRates[userId] = winRateData['win_rate'];
+                _loadingWinRates.remove(userId);
+              });
+            }
+          });
+        }
+      }
     }
   }
 
@@ -328,13 +362,35 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                   fontSize: 10,
                                                 ),
                                               ),
-                                              subtitle: Text(
-                                                'ID: ${user['id']}',
-                                                style: const TextStyle(
-                                                  color: Colors.green,
-                                                  fontFamily: 'PressStart2P',
-                                                  fontSize: 10,
-                                                ),
+                                              subtitle: Row(
+                                                children: [
+                                                  Text(
+                                                    'ID: ${user['id']}',
+                                                    style: const TextStyle(
+                                                      color: Colors.green,
+                                                      fontFamily:
+                                                          'PressStart2P',
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    _userWinRates.containsKey(
+                                                            user['id'])
+                                                        ? 'WR: ${_userWinRates[user['id']]!.toStringAsFixed(1)}%'
+                                                        : _loadingWinRates
+                                                                .contains(
+                                                                    user['id'])
+                                                            ? 'WR: loading...'
+                                                            : 'WR: --',
+                                                    style: const TextStyle(
+                                                      color: Colors.green,
+                                                      fontFamily:
+                                                          'PressStart2P',
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                               trailing: ElevatedButton(
                                                 onPressed: () {

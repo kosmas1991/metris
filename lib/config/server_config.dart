@@ -17,7 +17,7 @@ class ServerConfig {
 
   // HTTP API URL (with port)
   static String get apiUrl => 'http://$baseUrl:8000';
-  
+
   // WebSocket URL (with port)
   static String get wsUrl => 'ws://$baseUrl:8000';
 }
