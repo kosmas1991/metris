@@ -113,16 +113,16 @@ class _LobbyScreenState extends State<LobbyScreen> {
   void _handleGameStarting(Map<String, dynamic> data) {
     // Extract the game UID from the message
     final gameUid = data['gameUid'];
-    final message = data['message'];
+    // final message = data['message'];
 
     // Show a snackbar message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text(message),
+    //     backgroundColor: Colors.green,
+    //     duration: const Duration(seconds: 3),
+    //   ),
+    // );
 
     // Close the room connection as we'll be moving to the game screen
     _roomSubscription?.cancel();

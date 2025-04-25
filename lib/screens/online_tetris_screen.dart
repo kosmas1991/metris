@@ -160,7 +160,6 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
   void _handleReceiveGarbage(Map<String, dynamic> data) {
     setState(() {
       _garbageQueue += (data['lines'] as num).toInt();
-      print('D E B U G   -------  _garbageQueue: ${_garbageQueue}');
     });
 
     // Add the garbage on next piece placement
@@ -279,6 +278,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       setState(() {
         currentPiece.moveLeft();
       });
+      // Send board state update after moving left
+      _sendBoardState();
     }
   }
 
@@ -289,6 +290,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       setState(() {
         currentPiece.moveRight();
       });
+      // Send board state update after moving right
+      _sendBoardState();
     }
   }
 
@@ -300,6 +303,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       setState(() {
         currentPiece.rotate(rotationState);
       });
+      // Send board state update after rotation
+      _sendBoardState();
     }
   }
 
@@ -310,6 +315,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       setState(() {
         currentPiece.moveDown();
       });
+      // Send board state update after moving down
+      _sendBoardState();
     } else {
       // Lock the piece in place
       placePiece();
@@ -463,6 +470,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
         }
       });
 
+      // Send board state update after lines are cleared
+      _sendBoardState();
+
       // Send garbage lines to opponent based on how many lines were cleared
       int garbageLines = 0;
       switch (linesToRemove.length) {
@@ -524,6 +534,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       // Reset the garbage queue
       _garbageQueue = 0;
     });
+
+    // Send board state update after adding garbage lines
+    _sendBoardState();
   }
 
   // Queue garbage lines (called when garbage buttons are pressed)
@@ -735,7 +748,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
 
   Widget _buildGameInfo() {
     return Container(
-      height: 70,
+      height: 80,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
@@ -752,22 +765,22 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
               color: Colors.green,
             ),
           ),
-          if (isGameOver && gameResult != null)
-            Column(
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  gameResult!,
-                  style: TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 12,
-                    color: gameResult == 'You Win!' ? Colors.green : Colors.red,
-                  ),
-                ),
-              ],
-            ),
+          // if (isGameOver && gameResult != null)
+          //   Column(
+          //     children: [
+          //       SizedBox(
+          //         height: 10,
+          //       ),
+          //       Text(
+          //         gameResult!,
+          //         style: TextStyle(
+          //           fontFamily: 'PressStart2P',
+          //           fontSize: 12,
+          //           color: gameResult == 'You Win!' ? Colors.green : Colors.red,
+          //         ),
+          //       ),
+          //     ],
+          //   ),
           if (_garbageQueue > 0)
             Column(
               children: [
@@ -782,8 +795,13 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
                     color: Colors.red,
                   ),
                 ),
+                SizedBox(
+                  height: 10,
+                ),
               ],
             ),
+
+          Text("garbage column: ${_garbageColumn + 1}")
         ],
       ),
     );
