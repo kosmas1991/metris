@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metris/blocs/user_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import '../screens/online_tetris_screen.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -88,6 +89,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
         setState(() {
           _roomUsers = data['users'] ?? [];
         });
+      } else if (data['event'] == 'game_starting') {
+        _handleGameStarting(data);
       } else if (data['event'] == 'game started') {
         setState(() {
           _roomUsers = data['users'] ?? [];
@@ -104,6 +107,34 @@ class _LobbyScreenState extends State<LobbyScreen> {
       // Handle error
     }, onDone: () {
       // Handle done
+    });
+  }
+
+  void _handleGameStarting(Map<String, dynamic> data) {
+    // Extract the game UID from the message
+    final gameUid = data['gameUid'];
+    final message = data['message'];
+
+    // Show a snackbar message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+
+    // Close the room connection as we'll be moving to the game screen
+    _roomSubscription?.cancel();
+    _roomChannel?.sink.close();
+
+    // Navigate to the online tetris screen with the game UID
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => OnlineTetrisScreen(gameUid: gameUid),
+        ),
+      );
     });
   }
 
@@ -210,9 +241,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Online Users Section (now getting less height ratio)
+                  // Online Users Section
                   Expanded(
-                    flex: 3, // Flex ratio compared to the room section
+                    flex: 3,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 8.0),
@@ -286,8 +317,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                 size: 40,
                                               ),
                                               title: Text(
-                                                maxLines: 1,
                                                 user['username'] ?? '',
+                                                maxLines: 1,
                                                 style: const TextStyle(
                                                   color: Colors.green,
                                                   fontFamily: 'PressStart2P',
@@ -341,10 +372,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     ),
                   ),
 
-                  // Room Data Section (1/3 height)
+                  // Room Data Section
                   Expanded(
-                    flex:
-                        2, // Increased flex from 1 to 2 to make the room container bigger
+                    flex: 2,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 8.0),
@@ -483,18 +513,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                       : Colors.green,
                                                   textStyle: const TextStyle(
                                                     fontFamily: 'PressStart2P',
-                                                    fontSize:
-                                                        6, // Smaller font size from 8 to 6
+                                                    fontSize: 6,
                                                   ),
                                                   padding: const EdgeInsets
                                                       .symmetric(
-                                                    horizontal:
-                                                        8, // Reduced padding from 10 to 8
-                                                    vertical:
-                                                        4, // Reduced padding from 6 to 4
+                                                    horizontal: 8,
+                                                    vertical: 4,
                                                   ),
-                                                  minimumSize: const Size(55,
-                                                      25), // Set minimum size to be smaller
+                                                  minimumSize:
+                                                      const Size(55, 25),
                                                 ),
                                                 child: Text(_isReady
                                                     ? 'NOT READY'
@@ -516,18 +543,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                     textStyle: const TextStyle(
                                                       fontFamily:
                                                           'PressStart2P',
-                                                      fontSize:
-                                                          6, // Smaller font size from 8 to 6
+                                                      fontSize: 6,
                                                     ),
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                      horizontal:
-                                                          8, // Reduced padding from 10 to 8
-                                                      vertical:
-                                                          4, // Reduced padding from 6 to 4
+                                                      horizontal: 8,
+                                                      vertical: 4,
                                                     ),
-                                                    minimumSize: const Size(55,
-                                                        25), // Set minimum size to be smaller
+                                                    minimumSize:
+                                                        const Size(55, 25),
                                                   ),
                                                   child: const Text('LEAVE'),
                                                 ),

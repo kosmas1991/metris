@@ -1,4 +1,5 @@
 import 'imports/app_imports.dart';
+import 'screens/online_tetris_screen.dart';
 
 //adb reverse tcp:8000 tcp:8000
 
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
           '/register': (context) => const RegisterScreen(),
           '/lobby': (context) => const LobbyScreen(),
           '/settings': (context) => const SettingsScreen(),
+          '/online_tetris': (context) => const OnlineTetrisScreen(gameUid: ''),
         },
       ),
     );
