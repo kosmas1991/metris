@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metris/blocs/user_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../screens/online_tetris_screen.dart';
+import '../config/server_config.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -44,7 +45,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
       _username = userState.username;
 
       // Connect to lobby websocket
-      final url = 'ws://localhost:8000/ws/lobby?token=$_token';
+      final url =
+          'ws://${ServerConfig.host}:${ServerConfig.port}/ws/lobby?token=$_token';
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _subscription = _channel!.stream.listen((event) {
         final data = jsonDecode(event);
@@ -67,7 +69,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomSubscription?.cancel();
     _roomChannel?.sink.close();
 
-    final url = 'ws://localhost:8000/ws/room/$roomId?token=$_token';
+    final url =
+        'ws://${ServerConfig.host}:${ServerConfig.port}/ws/room/$roomId?token=$_token';
     _roomChannel = WebSocketChannel.connect(Uri.parse(url));
 
     setState(() {

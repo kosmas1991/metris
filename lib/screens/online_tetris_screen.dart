@@ -10,6 +10,7 @@ import '../widgets/game_board.dart';
 import '../widgets/next_piece.dart';
 import '../blocs/rotation_bloc.dart';
 import '../blocs/user_bloc.dart';
+import '../config/server_config.dart';
 
 class OnlineTetrisScreen extends StatefulWidget {
   final String gameUid;
@@ -79,8 +80,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
     if (userState is UserAuthenticated) {
       _token = userState.accessToken;
 
-      // Connect to game websocket
-      final url = 'ws://localhost:8000/ws/game/${widget.gameUid}?token=$_token';
+      // Connect to game websocket using the ServerConfig
+      final url =
+          '${ServerConfig.wsUrl}/ws/game/${widget.gameUid}?token=$_token';
       _gameChannel = WebSocketChannel.connect(Uri.parse(url));
 
       _gameSubscription = _gameChannel!.stream.listen((event) {
