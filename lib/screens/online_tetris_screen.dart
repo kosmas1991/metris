@@ -498,7 +498,23 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
 
   void _sendBoardState() {
     if (_gameChannel != null && _bothPlayersConnected) {
-      _gameChannel!.sink.add(jsonEncode({"board": gameBoard}));
+      // Create a copy of the game board to add the current piece
+      List<List<int>> boardWithPiece = List.generate(
+        boardHeight,
+        (y) => List.generate(boardWidth, (x) => gameBoard[y][x]),
+      );
+
+      // Add current piece to the board copy
+      for (final point in currentPiece.positions) {
+        final x = point.dx.toInt() + currentPiece.x;
+        final y = point.dy.toInt() + currentPiece.y;
+
+        if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight) {
+          boardWithPiece[y][x] = currentPiece.type;
+        }
+      }
+
+      _gameChannel!.sink.add(jsonEncode({"board": boardWithPiece}));
     }
   }
 
