@@ -212,442 +212,447 @@ class _LobbyScreenState extends State<LobbyScreen> {
     if (userState is UserAuthenticated) {
       loggedInText = 'logged in as: ${userState.username} (${userState.id})';
     }
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            const Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Lobby',
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontFamily: 'PressStart2P',
-                      fontSize: 24,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Icon(
-                    Icons.people,
-                    color: Colors.green,
-                  )
-                ],
-              ),
-            ),
-            if (loggedInText != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Center(
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 18),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(70),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.green, width: 2),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.person, color: Colors.green, size: 18),
-                        const SizedBox(width: 8),
-                        Text(
-                          loggedInText,
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontFamily: 'PressStart2P',
-                            fontSize: 5,
-                            fontWeight: FontWeight.bold,
-                          ),
+    return Center(
+      child: SizedBox(
+        width: 450,
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                const Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Lobby',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontFamily: 'PressStart2P',
+                          fontSize: 24,
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(
+                        Icons.people,
+                        color: Colors.green,
+                      )
+                    ],
                   ),
                 ),
-              ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Online Users Section
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              border: Border.all(color: Colors.green, width: 2),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
+                if (loggedInText != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Center(
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 8, horizontal: 18),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(70),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.green, width: 2),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.person, color: Colors.green, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              loggedInText,
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontFamily: 'PressStart2P',
+                                fontSize: 5,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            child: const Center(
-                              child: Text(
-                                'Online Users',
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontFamily: 'PressStart2P',
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                border:
-                                    Border.all(color: Colors.green, width: 2),
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(16),
-                                  bottomRight: Radius.circular(16),
-                                ),
-                              ),
-                              child: _users.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        'No users in lobby',
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontFamily: 'PressStart2P',
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: _users.length,
-                                      padding: const EdgeInsets.all(8.0),
-                                      itemBuilder: (context, index) {
-                                        final user = _users[index];
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withAlpha(70),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              border: Border.all(
-                                                  color: Colors.green,
-                                                  width: 2),
-                                            ),
-                                            child: ListTile(
-                                              leading: const Icon(
-                                                Icons.person,
-                                                color: Colors.green,
-                                                size: 40,
-                                              ),
-                                              title: Text(
-                                                user['username'] ?? '',
-                                                maxLines: 1,
-                                                style: const TextStyle(
-                                                  color: Colors.green,
-                                                  fontFamily: 'PressStart2P',
-                                                  fontSize: 10,
-                                                ),
-                                              ),
-                                              subtitle: Row(
-                                                children: [
-                                                  Text(
-                                                    'ID: ${user['id']}',
-                                                    style: const TextStyle(
-                                                      color: Colors.green,
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                      fontSize: 8,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    _userWinRates.containsKey(
-                                                            user['id'])
-                                                        ? 'WR: ${_userWinRates[user['id']]!.toStringAsFixed(1)}%'
-                                                        : _loadingWinRates
-                                                                .contains(
-                                                                    user['id'])
-                                                            ? 'WR: loading...'
-                                                            : 'WR: --',
-                                                    style: const TextStyle(
-                                                      color: Colors.green,
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                      fontSize: 8,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              trailing: ElevatedButton(
-                                                onPressed: () {
-                                                  _joinRoom(
-                                                    user['id'].toString(),
-                                                    ownerUsername:
-                                                        user['username'],
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.black,
-                                                  side: const BorderSide(
-                                                      color: Colors.green,
-                                                      width: 2),
-                                                  foregroundColor: Colors.green,
-                                                  textStyle: const TextStyle(
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                      fontSize: 8),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 6),
-                                                  minimumSize:
-                                                      const Size(60, 30),
-                                                ),
-                                                child: const Text('Join'),
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-
-                  // Room Data Section
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              border: Border.all(color: Colors.green, width: 2),
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                _roomOwnerUsername != null
-                                    ? '${_isInOwnRoom ? 'My' : '$_roomOwnerUsername\'s'} Room'
-                                    : 'Room Data',
-                                style: const TextStyle(
-                                  color: Colors.green,
-                                  fontFamily: 'PressStart2P',
-                                  fontSize: 10,
+                const SizedBox(height: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Online Users Section
+                      Expanded(
+                        flex: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  border: Border.all(color: Colors.green, width: 2),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  ),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Online Users',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontFamily: 'PressStart2P',
+                                      fontSize: 10,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                border:
-                                    Border.all(color: Colors.green, width: 2),
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(16),
-                                  bottomRight: Radius.circular(16),
-                                ),
-                              ),
-                              child: _roomUsers.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        'No active room',
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontFamily: 'PressStart2P',
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    )
-                                  : Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: [
-                                          Expanded(
-                                            child: ListView.builder(
-                                              itemCount: _roomUsers.length,
-                                              itemBuilder: (context, index) {
-                                                final user = _roomUsers[index];
-                                                final isReady =
-                                                    user['status'] == 'ready';
-                                                return ListTile(
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    border:
+                                        Border.all(color: Colors.green, width: 2),
+                                    borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(16),
+                                      bottomRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: _users.isEmpty
+                                      ? const Center(
+                                          child: Text(
+                                            'No users in lobby',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontFamily: 'PressStart2P',
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.builder(
+                                          itemCount: _users.length,
+                                          padding: const EdgeInsets.all(8.0),
+                                          itemBuilder: (context, index) {
+                                            final user = _users[index];
+                                            return Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                  vertical: 8),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black.withAlpha(70),
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  border: Border.all(
+                                                      color: Colors.green,
+                                                      width: 2),
+                                                ),
+                                                child: ListTile(
                                                   leading: const Icon(
                                                     Icons.person,
                                                     color: Colors.green,
-                                                    size: 30,
+                                                    size: 40,
                                                   ),
                                                   title: Text(
                                                     user['username'] ?? '',
                                                     maxLines: 1,
                                                     style: const TextStyle(
                                                       color: Colors.green,
-                                                      fontFamily:
-                                                          'PressStart2P',
+                                                      fontFamily: 'PressStart2P',
                                                       fontSize: 10,
                                                     ),
                                                   ),
-                                                  trailing: Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: isReady
-                                                          ? Colors.green
-                                                              .withAlpha(30)
-                                                          : Colors.red
-                                                              .withAlpha(30),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                      border: Border.all(
-                                                        color: isReady
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                        width: 1,
+                                                  subtitle: Row(
+                                                    children: [
+                                                      Text(
+                                                        'ID: ${user['id']}',
+                                                        style: const TextStyle(
+                                                          color: Colors.green,
+                                                          fontFamily:
+                                                              'PressStart2P',
+                                                          fontSize: 8,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    child: Text(
-                                                      isReady
-                                                          ? 'READY'
-                                                          : 'NOT READY',
-                                                      style: TextStyle(
-                                                        color: isReady
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                        fontFamily:
-                                                            'PressStart2P',
-                                                        fontSize: 8,
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        _userWinRates.containsKey(
+                                                                user['id'])
+                                                            ? 'WR: ${_userWinRates[user['id']]!.toStringAsFixed(1)}%'
+                                                            : _loadingWinRates
+                                                                    .contains(
+                                                                        user['id'])
+                                                                ? 'WR: loading...'
+                                                                : 'WR: --',
+                                                        style: const TextStyle(
+                                                          color: Colors.green,
+                                                          fontFamily:
+                                                              'PressStart2P',
+                                                          fontSize: 8,
+                                                        ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
-                                                );
-                                              },
+                                                  trailing: ElevatedButton(
+                                                    onPressed: () {
+                                                      _joinRoom(
+                                                        user['id'].toString(),
+                                                        ownerUsername:
+                                                            user['username'],
+                                                      );
+                                                    },
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.black,
+                                                      side: const BorderSide(
+                                                          color: Colors.green,
+                                                          width: 2),
+                                                      foregroundColor: Colors.green,
+                                                      textStyle: const TextStyle(
+                                                          fontFamily:
+                                                              'PressStart2P',
+                                                          fontSize: 8),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 10,
+                                                          vertical: 6),
+                                                      minimumSize:
+                                                          const Size(60, 30),
+                                                    ),
+                                                    child: const Text('Join'),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+        
+                      // Room Data Section
+                      Expanded(
+                        flex: 2,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  border: Border.all(color: Colors.green, width: 2),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    _roomOwnerUsername != null
+                                        ? '${_isInOwnRoom ? 'My' : '$_roomOwnerUsername\'s'} Room'
+                                        : 'Room Data',
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontFamily: 'PressStart2P',
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    border:
+                                        Border.all(color: Colors.green, width: 2),
+                                    borderRadius: const BorderRadius.only(
+                                      bottomLeft: Radius.circular(16),
+                                      bottomRight: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: _roomUsers.isEmpty
+                                      ? const Center(
+                                          child: Text(
+                                            'No active room',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontFamily: 'PressStart2P',
+                                              fontSize: 12,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
                                             children: [
-                                              ElevatedButton(
-                                                onPressed: _toggleReady,
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.black,
-                                                  side: BorderSide(
-                                                    color: _isReady
-                                                        ? Colors.red
-                                                        : Colors.green,
-                                                    width: 2,
-                                                  ),
-                                                  foregroundColor: _isReady
-                                                      ? Colors.red
-                                                      : Colors.green,
-                                                  textStyle: const TextStyle(
-                                                    fontFamily: 'PressStart2P',
-                                                    fontSize: 6,
-                                                  ),
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4,
-                                                  ),
-                                                  minimumSize:
-                                                      const Size(55, 25),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                  itemCount: _roomUsers.length,
+                                                  itemBuilder: (context, index) {
+                                                    final user = _roomUsers[index];
+                                                    final isReady =
+                                                        user['status'] == 'ready';
+                                                    return ListTile(
+                                                      leading: const Icon(
+                                                        Icons.person,
+                                                        color: Colors.green,
+                                                        size: 30,
+                                                      ),
+                                                      title: Text(
+                                                        user['username'] ?? '',
+                                                        maxLines: 1,
+                                                        style: const TextStyle(
+                                                          color: Colors.green,
+                                                          fontFamily:
+                                                              'PressStart2P',
+                                                          fontSize: 10,
+                                                        ),
+                                                      ),
+                                                      trailing: Container(
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          color: isReady
+                                                              ? Colors.green
+                                                                  .withAlpha(30)
+                                                              : Colors.red
+                                                                  .withAlpha(30),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  8),
+                                                          border: Border.all(
+                                                            color: isReady
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                            width: 1,
+                                                          ),
+                                                        ),
+                                                        child: Text(
+                                                          isReady
+                                                              ? 'READY'
+                                                              : 'NOT READY',
+                                                          style: TextStyle(
+                                                            color: isReady
+                                                                ? Colors.green
+                                                                : Colors.red,
+                                                            fontFamily:
+                                                                'PressStart2P',
+                                                            fontSize: 8,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
-                                                child: Text(_isReady
-                                                    ? 'NOT READY'
-                                                    : 'READY'),
                                               ),
-                                              if (!_isInOwnRoom) ...[
-                                                const SizedBox(width: 10),
-                                                ElevatedButton(
-                                                  onPressed: _leaveRoom,
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.black,
-                                                    side: const BorderSide(
-                                                      color: Colors.red,
-                                                      width: 2,
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: _toggleReady,
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.black,
+                                                      side: BorderSide(
+                                                        color: _isReady
+                                                            ? Colors.red
+                                                            : Colors.green,
+                                                        width: 2,
+                                                      ),
+                                                      foregroundColor: _isReady
+                                                          ? Colors.red
+                                                          : Colors.green,
+                                                      textStyle: const TextStyle(
+                                                        fontFamily: 'PressStart2P',
+                                                        fontSize: 6,
+                                                      ),
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
+                                                      minimumSize:
+                                                          const Size(55, 25),
                                                     ),
-                                                    foregroundColor: Colors.red,
-                                                    textStyle: const TextStyle(
-                                                      fontFamily:
-                                                          'PressStart2P',
-                                                      fontSize: 6,
-                                                    ),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4,
-                                                    ),
-                                                    minimumSize:
-                                                        const Size(55, 25),
+                                                    child: Text(_isReady
+                                                        ? 'NOT READY'
+                                                        : 'READY'),
                                                   ),
-                                                  child: const Text('LEAVE'),
-                                                ),
-                                              ],
+                                                  if (!_isInOwnRoom) ...[
+                                                    const SizedBox(width: 10),
+                                                    ElevatedButton(
+                                                      onPressed: _leaveRoom,
+                                                      style:
+                                                          ElevatedButton.styleFrom(
+                                                        backgroundColor:
+                                                            Colors.black,
+                                                        side: const BorderSide(
+                                                          color: Colors.red,
+                                                          width: 2,
+                                                        ),
+                                                        foregroundColor: Colors.red,
+                                                        textStyle: const TextStyle(
+                                                          fontFamily:
+                                                              'PressStart2P',
+                                                          fontSize: 6,
+                                                        ),
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 8,
+                                                          vertical: 4,
+                                                        ),
+                                                        minimumSize:
+                                                            const Size(55, 25),
+                                                      ),
+                                                      child: const Text('LEAVE'),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                            ),
+                                        ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24, top: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _RetroButton(
+                        text: 'HOME',
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed('/');
+                        },
+                      ),
+                      const SizedBox(width: 30),
+                      _RetroButton(
+                        text: 'LOGOUT',
+                        onPressed: () {
+                          context.read<UserBloc>().add(UserLogoutRequested());
+                          Navigator.of(context).pushReplacementNamed('/login');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24, top: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _RetroButton(
-                    text: 'HOME',
-                    onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/');
-                    },
-                  ),
-                  const SizedBox(width: 30),
-                  _RetroButton(
-                    text: 'LOGOUT',
-                    onPressed: () {
-                      context.read<UserBloc>().add(UserLogoutRequested());
-                      Navigator.of(context).pushReplacementNamed('/login');
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
