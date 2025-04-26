@@ -2,8 +2,6 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tetris/config/server_config.dart';
 
 part 'user_event.dart';

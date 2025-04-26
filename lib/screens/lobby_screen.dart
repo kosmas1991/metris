@@ -101,8 +101,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomSubscription?.cancel();
     _roomChannel?.sink.close();
 
-    final url =
-        '${ServerConfig.wsUrl}/ws/room/$roomId?token=$_token';
+    final url = '${ServerConfig.wsUrl}/ws/room/$roomId?token=$_token';
     _roomChannel = WebSocketChannel.connect(Uri.parse(url));
 
     setState(() {
@@ -129,13 +128,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
         setState(() {
           _roomUsers = data['users'] ?? [];
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Game started!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Game started!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
       }
     }, onError: (e) {
       // Handle error
@@ -164,11 +165,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
     // Navigate to the online tetris screen with the game UID
     Future.delayed(const Duration(seconds: 1), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => OnlineTetrisScreen(gameUid: gameUid),
-        ),
-      );
+      if (mounted) {
+        // Add mounted check before using context
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => OnlineTetrisScreen(gameUid: gameUid),
+          ),
+        );
+      }
     });
   }
 
@@ -246,8 +250,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: Center(
                       child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 8, horizontal: 18),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 18),
                         decoration: BoxDecoration(
                           color: Colors.black.withAlpha(70),
                           borderRadius: BorderRadius.circular(30),
@@ -256,7 +260,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.person, color: Colors.green, size: 18),
+                            const Icon(Icons.person,
+                                color: Colors.green, size: 18),
                             const SizedBox(width: 8),
                             Text(
                               loggedInText,
@@ -287,10 +292,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
-                                  border: Border.all(color: Colors.green, width: 2),
+                                  border:
+                                      Border.all(color: Colors.green, width: 2),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(16),
                                     topRight: Radius.circular(16),
@@ -311,8 +318,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.black,
-                                    border:
-                                        Border.all(color: Colors.green, width: 2),
+                                    border: Border.all(
+                                        color: Colors.green, width: 2),
                                     borderRadius: const BorderRadius.only(
                                       bottomLeft: Radius.circular(16),
                                       bottomRight: Radius.circular(16),
@@ -335,11 +342,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                           itemBuilder: (context, index) {
                                             final user = _users[index];
                                             return Padding(
-                                              padding: const EdgeInsets.symmetric(
-                                                  vertical: 8),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8),
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color: Colors.black.withAlpha(70),
+                                                  color: Colors.black
+                                                      .withAlpha(70),
                                                   borderRadius:
                                                       BorderRadius.circular(16),
                                                   border: Border.all(
@@ -357,7 +366,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                     maxLines: 1,
                                                     style: const TextStyle(
                                                       color: Colors.green,
-                                                      fontFamily: 'PressStart2P',
+                                                      fontFamily:
+                                                          'PressStart2P',
                                                       fontSize: 10,
                                                     ),
                                                   ),
@@ -374,12 +384,14 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                       ),
                                                       const SizedBox(width: 8),
                                                       Text(
-                                                        _userWinRates.containsKey(
-                                                                user['id'])
+                                                        _userWinRates
+                                                                .containsKey(
+                                                                    user['id'])
                                                             ? 'WR: ${_userWinRates[user['id']]!.toStringAsFixed(1)}%'
                                                             : _loadingWinRates
                                                                     .contains(
-                                                                        user['id'])
+                                                                        user[
+                                                                            'id'])
                                                                 ? 'WR: loading...'
                                                                 : 'WR: --',
                                                         style: const TextStyle(
@@ -399,12 +411,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                             user['username'],
                                                       );
                                                     },
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.black,
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.black,
                                                       side: const BorderSide(
                                                           color: Colors.green,
                                                           width: 2),
-                                                      foregroundColor: Colors.green,
+                                                      foregroundColor:
+                                                          Colors.green,
                                                       textStyle: const TextStyle(
                                                           fontFamily:
                                                               'PressStart2P',
@@ -429,7 +444,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           ),
                         ),
                       ),
-        
+
                       // Room Data Section
                       Expanded(
                         flex: 2,
@@ -440,10 +455,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
                                 decoration: BoxDecoration(
                                   color: Colors.black,
-                                  border: Border.all(color: Colors.green, width: 2),
+                                  border:
+                                      Border.all(color: Colors.green, width: 2),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(16),
                                     topRight: Radius.circular(16),
@@ -466,8 +483,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: Colors.black,
-                                    border:
-                                        Border.all(color: Colors.green, width: 2),
+                                    border: Border.all(
+                                        color: Colors.green, width: 2),
                                     borderRadius: const BorderRadius.only(
                                       bottomLeft: Radius.circular(16),
                                       bottomRight: Radius.circular(16),
@@ -491,10 +508,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                               Expanded(
                                                 child: ListView.builder(
                                                   itemCount: _roomUsers.length,
-                                                  itemBuilder: (context, index) {
-                                                    final user = _roomUsers[index];
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final user =
+                                                        _roomUsers[index];
                                                     final isReady =
-                                                        user['status'] == 'ready';
+                                                        user['status'] ==
+                                                            'ready';
                                                     return ListTile(
                                                       leading: const Icon(
                                                         Icons.person,
@@ -512,20 +532,23 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                         ),
                                                       ),
                                                       trailing: Container(
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
                                                           horizontal: 8,
                                                           vertical: 4,
                                                         ),
-                                                        decoration: BoxDecoration(
+                                                        decoration:
+                                                            BoxDecoration(
                                                           color: isReady
                                                               ? Colors.green
                                                                   .withAlpha(30)
                                                               : Colors.red
-                                                                  .withAlpha(30),
+                                                                  .withAlpha(
+                                                                      30),
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  8),
+                                                              BorderRadius
+                                                                  .circular(8),
                                                           border: Border.all(
                                                             color: isReady
                                                                 ? Colors.green
@@ -558,8 +581,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                 children: [
                                                   ElevatedButton(
                                                     onPressed: _toggleReady,
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.black,
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          Colors.black,
                                                       side: BorderSide(
                                                         color: _isReady
                                                             ? Colors.red
@@ -569,8 +594,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                       foregroundColor: _isReady
                                                           ? Colors.red
                                                           : Colors.green,
-                                                      textStyle: const TextStyle(
-                                                        fontFamily: 'PressStart2P',
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        fontFamily:
+                                                            'PressStart2P',
                                                         fontSize: 6,
                                                       ),
                                                       padding: const EdgeInsets
@@ -589,29 +616,33 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                     const SizedBox(width: 10),
                                                     ElevatedButton(
                                                       onPressed: _leaveRoom,
-                                                      style:
-                                                          ElevatedButton.styleFrom(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
                                                         backgroundColor:
                                                             Colors.black,
                                                         side: const BorderSide(
                                                           color: Colors.red,
                                                           width: 2,
                                                         ),
-                                                        foregroundColor: Colors.red,
-                                                        textStyle: const TextStyle(
+                                                        foregroundColor:
+                                                            Colors.red,
+                                                        textStyle:
+                                                            const TextStyle(
                                                           fontFamily:
                                                               'PressStart2P',
                                                           fontSize: 6,
                                                         ),
-                                                        padding: const EdgeInsets
-                                                            .symmetric(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
                                                           horizontal: 8,
                                                           vertical: 4,
                                                         ),
                                                         minimumSize:
                                                             const Size(55, 25),
                                                       ),
-                                                      child: const Text('LEAVE'),
+                                                      child:
+                                                          const Text('LEAVE'),
                                                     ),
                                                   ],
                                                 ],

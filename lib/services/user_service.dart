@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tetris/imports/app_imports.dart';
 import '../config/server_config.dart';
 
 class UserService {
@@ -18,11 +19,15 @@ class UserService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        print('Failed to load win rate data: ${response.statusCode}');
+        if (kDebugMode) {
+          print('Failed to load win rate data: ${response.statusCode}');
+        }
         return null;
       }
     } catch (e) {
-      print('Error fetching win rate: $e');
+      if (kDebugMode) {
+        print('Error fetching win rate: $e');
+      }
       return null;
     }
   }
