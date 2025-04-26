@@ -103,7 +103,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomChannel?.sink.close();
 
     final url =
-        'ws://${ServerConfig.host}:${ServerConfig.port}/ws/room/$roomId?token=$_token';
+        'ws://${ServerConfig.wsUrl}:${ServerConfig.port}/ws/room/$roomId?token=$_token';
     _roomChannel = WebSocketChannel.connect(Uri.parse(url));
 
     setState(() {
