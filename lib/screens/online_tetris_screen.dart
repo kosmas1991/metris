@@ -50,6 +50,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
   int _currentPieceIndex = 0;
   int _garbageColumn = 0;
   int _garbageQueue = 0;
+  int _linesCleared = 0; // Counter for lines cleared by the player
 
   // New variables for fast drop functionality
   Timer? fastDropTimer;
@@ -323,11 +324,11 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       // Lock the piece in place
       placePiece();
 
-      // Add garbage lines if there are any queued
-      addGarbageLines();
-
-      // Check for completed lines and send garbage to opponent if lines are cleared
+      // First, check for completed lines
       checkLines();
+
+      // Then add garbage lines if there are any queued, now with proper neutralization
+      addGarbageLines();
 
       // Send current board state to opponent
       _sendBoardState();
@@ -470,12 +471,15 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
           gameBoard.removeAt(line);
           gameBoard.insert(0, List.generate(boardWidth, (_) => 0));
         }
+
+        // Set the lines cleared count for garbage neutralization
+        _linesCleared = linesToRemove.length;
       });
 
       // Send board state update after lines are cleared
       _sendBoardState();
 
-      // Send garbage lines to opponent based on how many lines were cleared
+      // Calculate garbage lines to send based on how many lines were cleared
       int garbageLines = 0;
       switch (linesToRemove.length) {
         case 1:
@@ -492,7 +496,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
           break;
       }
 
-      if (garbageLines > 0) {
+      // If we have incoming garbage, it will be neutralized in addGarbageLines
+      // If we have no incoming garbage, send the attack to opponent right away
+      if (_garbageQueue <= 0 && garbageLines > 0) {
         _sendGarbageLines(garbageLines);
       }
     }
@@ -526,13 +532,45 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
     }
   }
 
-  // Add garbage lines function
+  // Add garbage lines function with neutralization logic
   void addGarbageLines() {
     if (_garbageQueue <= 0) return;
 
+    // Get the count of lines that were just cleared
+    int linesJustCleared = _linesCleared;
+    // Reset the counter for next time
+    _linesCleared = 0;
+
+    // Apply neutralization logic
+    int netGarbageLines = _garbageQueue - linesJustCleared;
+
+    if (netGarbageLines <= 0) {
+      // Player cleared more or equal lines than garbage - no garbage added
+
+      // If player cleared more lines than garbage, send the difference as attack
+      // Only send if they cleared MORE than their garbage (not equal)
+      if (netGarbageLines < 0) {
+        // Convert negative net garbage to positive attack garbage
+        int attackLines = -netGarbageLines;
+        _sendGarbageLines(attackLines);
+      }
+      // If equal (netGarbageLines == 0), player just neutralizes and doesn't send any attack
+
+      // Reset the garbage queue since it's been fully neutralized
+      setState(() {
+        _garbageQueue = 0;
+      });
+
+      return;
+    }
+
+    // If we get here, player still has some garbage to receive after neutralization
     setState(() {
-      // How many garbage lines to add this turn (all queued lines)
-      int linesToAdd = _garbageQueue;
+      // Update the garbage queue to the neutralized amount
+      _garbageQueue = netGarbageLines;
+
+      // How many garbage lines to add this turn
+      int linesToAdd = netGarbageLines;
 
       // Remove rows from the top to make room for garbage
       for (int i = 0; i < linesToAdd; i++) {
@@ -549,7 +587,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
         gameBoard.add(garbageLine);
       }
 
-      // Reset the garbage queue
+      // Reset the garbage queue after adding
       _garbageQueue = 0;
     });
 
