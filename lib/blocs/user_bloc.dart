@@ -23,7 +23,7 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     if (kDebugMode) {
       return dotenv.env['SERVER_URL_DEBUG'] ?? '127.0.0.1';
     } else {
-      return dotenv.env['SERVER_URL_PROD'] ?? 'kog.gr';
+      return dotenv.env['SERVER_URL_PROD'] ?? 'tetrisback.kog.gr';
     }
   }
 

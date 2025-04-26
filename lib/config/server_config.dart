@@ -7,7 +7,7 @@ class ServerConfig {
     if (kDebugMode) {
       return dotenv.env['SERVER_URL_DEBUG'] ?? 'localhost';
     } else {
-      return dotenv.env['SERVER_URL_PROD'] ?? 'kog.gr';
+      return dotenv.env['SERVER_URL_PROD'] ?? 'tetrisback.kog.gr';
     }
   }
 
