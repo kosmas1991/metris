@@ -50,7 +50,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
       // Connect to lobby websocket
       final url =
-          'ws://${ServerConfig.host}:${ServerConfig.port}/ws/lobby?token=$_token';
+          '${ServerConfig.wsUrl}/ws/lobby?token=$_token';
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _subscription = _channel!.stream.listen((event) {
         final data = jsonDecode(event);
