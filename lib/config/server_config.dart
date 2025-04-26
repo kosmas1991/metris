@@ -13,11 +13,25 @@ class ServerConfig {
 
   // For components that need the host and port separately
   static String get host => baseUrl;
-  static int get port => 7000;
 
-  // HTTP API URL (with port)
-  static String get apiUrl => 'http://$baseUrl:7000';
+  // Port is only used in debug mode
+  static int get port => kDebugMode ? 7000 : 443;
 
-  // WebSocket URL (with port)
-  static String get wsUrl => 'ws://$baseUrl:7000';
+  // HTTP API URL (with port for debug, without for production)
+  static String get apiUrl {
+    if (kDebugMode) {
+      return 'http://$baseUrl:7000';
+    } else {
+      return 'https://$baseUrl';
+    }
+  }
+
+  // WebSocket URL (with port for debug, without for production)
+  static String get wsUrl {
+    if (kDebugMode) {
+      return 'ws://$baseUrl:7000';
+    } else {
+      return 'wss://$baseUrl';
+    }
+  }
 }
