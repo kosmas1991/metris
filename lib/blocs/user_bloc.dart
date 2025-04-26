@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:metris/config/server_config.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -19,15 +20,8 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     add(UserAutoLoginRequested());
   }
 
-  String get _baseUrl {
-    if (kDebugMode) {
-      return dotenv.env['SERVER_URL_DEBUG'] ?? '127.0.0.1';
-    } else {
-      return dotenv.env['SERVER_URL_PROD'] ?? 'tetrisback.kog.gr';
-    }
-  }
-
-  String get _serverUrl => 'http://$_baseUrl:7000';
+  // Use the ServerConfig for server URL instead of custom implementation
+  String get _serverUrl => ServerConfig.apiUrl;
 
   // Handle automatic login using stored credentials
   Future<void> _onAutoLoginRequested(
