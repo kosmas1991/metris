@@ -27,7 +27,7 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     }
   }
 
-  String get _serverUrl => 'http://$_baseUrl:8000';
+  String get _serverUrl => 'http://$_baseUrl:7000';
 
   // Handle automatic login using stored credentials
   Future<void> _onAutoLoginRequested(

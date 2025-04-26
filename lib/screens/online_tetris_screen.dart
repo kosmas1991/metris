@@ -222,9 +222,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.black,
-        title: Text(
+        title: const Text(
           'Game Over',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.green,
             fontFamily: 'PressStart2P',
             fontSize: 20,
@@ -769,7 +769,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       height: 80,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.black,
       ),
       child: Column(
@@ -802,7 +802,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
           if (_garbageQueue > 0)
             Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Text(
@@ -813,7 +813,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
                     color: Colors.red,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
               ],
@@ -966,76 +966,6 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
               color: Colors.green,
               size: 50,
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Widget to build the garbage buttons
-  Widget _buildGarbageButtons() {
-    return Column(
-      children: [
-        const Text(
-          'ADD GARBAGE',
-          style: TextStyle(
-            fontFamily: 'PressStart2P',
-            fontSize: 10,
-            color: Colors.green,
-            letterSpacing: 1,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildGarbageButton('1', () => queueGarbageLines(1)),
-            const SizedBox(width: 8),
-            _buildGarbageButton('2', () => queueGarbageLines(2)),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildGarbageButton('3', () => queueGarbageLines(3)),
-            const SizedBox(width: 8),
-            _buildGarbageButton('4', () => queueGarbageLines(4)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // Widget for the individual garbage buttons
-  Widget _buildGarbageButton(String text, VoidCallback onPressed) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: Colors.green, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.green.withAlpha(50),
-              spreadRadius: 1,
-              blurRadius: 3,
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontFamily: 'PressStart2P',
-              fontSize: 14,
-              color: Colors.green,
-              fontWeight: FontWeight.normal,
-            ),
-            textAlign: TextAlign.center,
           ),
         ),
       ),

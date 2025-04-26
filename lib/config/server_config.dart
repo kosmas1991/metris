@@ -13,11 +13,11 @@ class ServerConfig {
 
   // For components that need the host and port separately
   static String get host => baseUrl;
-  static int get port => 8000;
+  static int get port => 7000;
 
   // HTTP API URL (with port)
-  static String get apiUrl => 'http://$baseUrl:8000';
+  static String get apiUrl => 'http://$baseUrl:7000';
 
   // WebSocket URL (with port)
-  static String get wsUrl => 'ws://$baseUrl:8000';
+  static String get wsUrl => 'ws://$baseUrl:7000';
 }

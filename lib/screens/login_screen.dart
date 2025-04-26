@@ -14,8 +14,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController =
-      TextEditingController(text: 'kosmasgou@gmail.com');
-  final _passwordController = TextEditingController(text: 'aserevlakA1!');
+      TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {

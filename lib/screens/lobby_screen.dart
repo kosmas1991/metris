@@ -26,11 +26,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
   String? _username;
 
   // Win rate data
-  Map<int, double> _userWinRates = {};
-  Set<int> _loadingWinRates = {};
+  final Map<int, double> _userWinRates = {};
+  final Set<int> _loadingWinRates = {};
 
   // Room data
-  String? _currentRoomId;
   String? _roomOwnerUsername;
   List<dynamic> _roomUsers = [];
   bool _isReady = false;
@@ -108,7 +107,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomChannel = WebSocketChannel.connect(Uri.parse(url));
 
     setState(() {
-      _currentRoomId = roomId;
       _roomOwnerUsername = ownerUsername ?? _username;
       _isInOwnRoom = ownerUsername == null;
       _isReady = false;
@@ -189,7 +187,6 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomChannel?.sink.close();
 
     setState(() {
-      _currentRoomId = null;
       _roomOwnerUsername = null;
       _roomUsers = [];
       _isReady = false;
@@ -521,9 +518,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                     decoration: BoxDecoration(
                                                       color: isReady
                                                           ? Colors.green
-                                                              .withOpacity(0.3)
+                                                              .withAlpha(30)
                                                           : Colors.red
-                                                              .withOpacity(0.3),
+                                                              .withAlpha(30),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               8),

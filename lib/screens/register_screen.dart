@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:metris/screens/login_screen.dart';
@@ -14,15 +12,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  static var rand = Random().nextInt(100) + 3;
   final _formKey = GlobalKey<FormState>();
   final _usernameController =
-      TextEditingController(text: 'kosmasgou$rand@gmail.com');
+      TextEditingController();
   final _emailController =
-      TextEditingController(text: 'kosmasgou$rand@gmail.com');
-  final _firstNameController = TextEditingController(text: 'Kosmas');
-  final _lastNameController = TextEditingController(text: 'Goumas');
-  final _passwordController = TextEditingController(text: 'aserevlakA1!');
+      TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {

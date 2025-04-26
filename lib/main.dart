@@ -1,7 +1,7 @@
 import 'imports/app_imports.dart';
 import 'screens/online_tetris_screen.dart';
 
-//adb reverse tcp:8000 tcp:8000
+//adb reverse tcp:7000 tcp:7000
 
 //!    L E T ' S     G O    :-)
 
