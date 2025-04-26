@@ -1,4 +1,4 @@
-name: metris
+name: tetris
 description: "A Tetris game app with multiple features"
 publish_to: 'none'
 version: 1.0.0+1
@@ -9,29 +9,32 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.3
+  flutter_bloc: ^9.1.0
   equatable: ^2.0.5
   shared_preferences: ^2.2.0
-  audioplayers: ^5.2.1
+  audioplayers: ^6.4.0
   google_fonts: ^6.1.0
-  hydrated_bloc: ^9.1.2
+  hydrated_bloc: ^10.0.0
   path_provider: ^2.1.1
   package_rename_plus: ^1.0.2
   icons_launcher: ^3.0.1
-  firebase_core: ^3.12.1
   http: ^1.3.0
   flutter_dotenv: ^5.1.0
   web_socket_channel: ^3.0.3
+  package_rename: ^1.10.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
 
 package_rename_config:
   android:
-    app_name: metris # (String) The display name of the android app
-    package_name: gr.techzombie.metris # (String) The package name of the android app
+    app_name: tetris # (String) The display name of the android app
+    package_name: gr.techzombie.tetris # (String) The package name of the android app
+  web:
+    app_name: tetris # (String) The title of the web app and PWA
+    short_app_name: tetris # (String) The short display name of the PWA (Optional
 
 flutter:
   uses-material-design: true

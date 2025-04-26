@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metris/screens/login_screen.dart';
+import 'package:tetris/screens/login_screen.dart';
 import '../blocs/user_bloc.dart';
 import '../widgets/retro_text_field.dart';
 

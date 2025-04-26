@@ -1,16 +1,14 @@
 // Barrel file for all main imports
-export 'package:firebase_core/firebase_core.dart';
 export 'package:flutter/foundation.dart';
 export 'package:flutter/material.dart';
 export 'package:flutter/services.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:hydrated_bloc/hydrated_bloc.dart';
-export 'package:metris/blocs/user_bloc.dart';
-export 'package:metris/firebase/firebase_options.dart';
-export 'package:metris/screens/login_screen.dart';
-export 'package:metris/screens/register_screen.dart';
-export 'package:metris/screens/settings_screen.dart';
-export 'package:metris/widgets/simple_bloc_observer.dart';
+export 'package:tetris/blocs/user_bloc.dart';
+export 'package:tetris/screens/login_screen.dart';
+export 'package:tetris/screens/register_screen.dart';
+export 'package:tetris/screens/settings_screen.dart';
+export 'package:tetris/widgets/simple_bloc_observer.dart';
 export 'package:path_provider/path_provider.dart';
 export '../blocs/score_bloc.dart';
 export '../blocs/rotation_bloc.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:metris/blocs/user_bloc.dart';
+import 'package:tetris/blocs/user_bloc.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../screens/online_tetris_screen.dart';
 import '../config/server_config.dart';
