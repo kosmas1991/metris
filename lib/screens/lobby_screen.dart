@@ -49,8 +49,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       _username = userState.username;
 
       // Connect to lobby websocket
-      final url =
-          '${ServerConfig.wsUrl}/ws/lobby?token=$_token';
+      final url = '${ServerConfig.wsUrl}/ws/lobby?token=$_token';
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _subscription = _channel!.stream.listen((event) {
         final data = jsonDecode(event);
@@ -103,7 +102,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _roomChannel?.sink.close();
 
     final url =
-        'ws://${ServerConfig.wsUrl}:${ServerConfig.port}/ws/room/$roomId?token=$_token';
+        '${ServerConfig.wsUrl}/ws/room/$roomId?token=$_token';
     _roomChannel = WebSocketChannel.connect(Uri.parse(url));
 
     setState(() {
