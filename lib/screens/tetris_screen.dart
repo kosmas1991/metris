@@ -10,6 +10,7 @@ import '../widgets/next_piece.dart';
 import '../widgets/score_board.dart';
 import '../blocs/score_bloc.dart';
 import '../blocs/rotation_bloc.dart';
+import '../services/audio_service.dart'; // Add audio service import
 
 class TetrisScreen extends StatefulWidget {
   const TetrisScreen({super.key});
@@ -21,6 +22,7 @@ class TetrisScreen extends StatefulWidget {
 class _TetrisScreenState extends State<TetrisScreen> {
   // Focus node to handle keyboard inputs
   final FocusNode _focusNode = FocusNode();
+  final AudioService _audioService = AudioService();
 
   static const int boardWidth = 10;
   static const int boardHeight = 20;
@@ -81,6 +83,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
     currentPiece = Tetromino.getRandom();
     nextPiece = Tetromino.getRandom();
 
+    // Play game start sound
+    _audioService.playSound(SoundType.gameStart);
+
     // Start game timer
     gameTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (!isGameOver) {
@@ -97,6 +102,7 @@ class _TetrisScreenState extends State<TetrisScreen> {
     moveLeftTimer?.cancel();
     moveRightTimer?.cancel();
     _focusNode.dispose(); // Dispose the focus node
+    _audioService.stopAllSounds(); // Stop all sounds when leaving the screen
     super.dispose();
   }
 
@@ -128,6 +134,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
       setState(() {
         currentPiece.rotate(rotationState);
       });
+
+      // Play rotation sound
+      _audioService.playSound(SoundType.rotate);
     }
   }
 
@@ -160,6 +169,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
         _saveHighScore(); // Save high score when game is over
         gameTimer.cancel();
         cancelFastDrop();
+
+        // Play game over sound
+        _audioService.playSound(SoundType.gameOver);
       }
     }
   }
@@ -275,15 +287,19 @@ class _TetrisScreenState extends State<TetrisScreen> {
         switch (linesToRemove.length) {
           case 1:
             score += 100;
+            _audioService.playSound(SoundType.clearLine);
             break;
           case 2:
             score += 300;
+            _audioService.playSound(SoundType.clearLine);
             break;
           case 3:
             score += 500;
+            _audioService.playSound(SoundType.clearLine);
             break;
           case 4:
             score += 800; // Tetris!
+            _audioService.playSound(SoundType.clearTetris);
             break;
         }
 
@@ -327,6 +343,9 @@ class _TetrisScreenState extends State<TetrisScreen> {
             );
         gameBoard.add(garbageLine);
       }
+
+      // Play sound for applying garbage
+      _audioService.playSound(SoundType.applyGarbage);
 
       // Reset the garbage queue
       garbageQueue = 0;

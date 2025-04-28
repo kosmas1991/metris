@@ -1,5 +1,6 @@
 import 'imports/app_imports.dart';
 import 'screens/online_tetris_screen.dart';
+import 'services/audio_service.dart';
 
 //adb reverse tcp:7000 tcp:7000
 
@@ -8,6 +9,11 @@ import 'screens/online_tetris_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+
+  // Initialize audio service
+  final audioService = AudioService();
+  await audioService.initialize();
+
   Bloc.observer = SimpleBlocObserver();
   final HydratedStorage storage = await HydratedStorage.build(
     storageDirectory: kIsWeb

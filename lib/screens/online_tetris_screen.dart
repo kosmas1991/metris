@@ -11,6 +11,7 @@ import '../widgets/next_piece.dart';
 import '../blocs/rotation_bloc.dart';
 import '../blocs/user_bloc.dart';
 import '../config/server_config.dart';
+import '../services/audio_service.dart';
 
 class OnlineTetrisScreen extends StatefulWidget {
   final String gameUid;
@@ -24,6 +25,7 @@ class OnlineTetrisScreen extends StatefulWidget {
 class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
   // Focus node to handle keyboard inputs
   final FocusNode _focusNode = FocusNode();
+  final AudioService _audioService = AudioService();
 
   static const int boardWidth = 10;
   static const int boardHeight = 20;
@@ -129,6 +131,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       _currentPieceIndex++;
       nextPiece = Tetromino(type: _pieceSequence![_currentPieceIndex]);
 
+      // Play game start sound
+      _audioService.playSound(SoundType.gameStart);
+
       // Start the game timer
       gameTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
         if (!isGameOver) {
@@ -183,6 +188,13 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       isGameOver = true;
       gameResult = (username == winner) ? 'You Win!' : 'You Lose!';
     });
+
+    // Play victory/defeat sound
+    if (username == winner) {
+      _audioService.playSound(SoundType.victory);
+    } else {
+      _audioService.playSound(SoundType.gameOver);
+    }
 
     gameTimer.cancel();
 
@@ -259,6 +271,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
   }
 
   void _returnToLobby() {
+    // Make sure to restart lobby soundtrack when returning to lobby
+    _audioService.playSound(SoundType.lobbySoundtrack);
     Navigator.of(context).pushReplacementNamed('/lobby');
   }
 
@@ -271,6 +285,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
     _focusNode.dispose();
     _gameSubscription?.cancel();
     _gameChannel?.sink.close();
+    // Stop all audio when leaving the game screen
+    _audioService.stopAllSounds();
     super.dispose();
   }
 
@@ -306,6 +322,8 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
       setState(() {
         currentPiece.rotate(rotationState);
       });
+      // Play rotation sound
+      _audioService.playSound(SoundType.rotate);
       // Send board state update after rotation
       _sendBoardState();
     }
@@ -476,6 +494,13 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
         _linesCleared = linesToRemove.length;
       });
 
+      // Play appropriate sound based on number of lines cleared
+      if (linesToRemove.length == 4) {
+        _audioService.playSound(SoundType.clearTetris);
+      } else {
+        _audioService.playSound(SoundType.clearLine);
+      }
+
       // Send board state update after lines are cleared
       _sendBoardState();
 
@@ -586,6 +611,9 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
             );
         gameBoard.add(garbageLine);
       }
+
+      // Play sound for applying garbage
+      _audioService.playSound(SoundType.applyGarbage);
 
       // Reset the garbage queue after adding
       _garbageQueue = 0;
@@ -719,7 +747,7 @@ class _OnlineTetrisScreenState extends State<OnlineTetrisScreen> {
                       ),
                     ],
                   ),
-                  child: GameBoard(
+                 child: GameBoard(
                     board: gameBoard,
                     currentPiece: currentPiece,
                   ),

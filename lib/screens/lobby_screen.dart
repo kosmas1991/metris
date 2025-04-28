@@ -7,6 +7,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../screens/online_tetris_screen.dart';
 import '../config/server_config.dart';
 import '../services/user_service.dart';
+import '../services/audio_service.dart';
 
 class LobbyScreen extends StatefulWidget {
   const LobbyScreen({super.key});
@@ -24,6 +25,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
   String? _token;
   String? _userId;
   String? _username;
+  final AudioService _audioService = AudioService();
 
   // Win rate data
   final Map<int, double> _userWinRates = {};
@@ -38,6 +40,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
   @override
   void initState() {
     super.initState();
+    // Start playing lobby music
+    _audioService.playSound(SoundType.lobbySoundtrack);
     WidgetsBinding.instance.addPostFrameCallback((_) => _connectWebSocket());
   }
 
@@ -206,6 +210,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _channel?.sink.close();
     _roomSubscription?.cancel();
     _roomChannel?.sink.close();
+    // Stop the lobby soundtrack when leaving the lobby screen
+    _audioService.stopBackgroundSound();
     super.dispose();
   }
 
@@ -355,7 +361,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                                       color: Colors.green,
                                                       width: 2),
                                                 ),
-                                                child: ListTile(
+                                              child: ListTile(
                                                   leading: const Icon(
                                                     Icons.person,
                                                     color: Colors.green,

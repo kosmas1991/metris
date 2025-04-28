@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/rotation_bloc.dart';
+import '../services/audio_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -12,6 +13,20 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _soundEnabled = true;
   double _difficulty = 1.0;
+  final AudioService _audioService = AudioService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    await _audioService.initialize();
+    setState(() {
+      _soundEnabled = _audioService.isSoundEnabled;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +81,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildRetroSwitch(
                     title: 'SOUND',
                     value: _soundEnabled,
-                    onChanged: (value) {
+                    onChanged: (value) async {
                       setState(() {
                         _soundEnabled = value;
                       });
+                      await _audioService.setSoundEnabled(value);
                     },
                   ),
                   const SizedBox(height: 30),
